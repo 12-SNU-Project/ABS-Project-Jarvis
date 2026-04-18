@@ -1,0 +1,147 @@
+[gd_scene format=3 uid="uid://c7xq2k2xjqkq4"]
+
+[ext_resource type="Script" uid="uid://bect2o8eyn4lu" path="res://scripts/main.gd" id="1_xxx"]
+
+[node name="Main" type="Node2D" unique_id=2038885885]
+script = ExtResource("1_xxx")
+
+[node name="SimsSceneNode" type="Node2D" parent="." unique_id=1623309643]
+
+[node name="AIChatBubble" type="RichTextLabel" parent="SimsSceneNode" unique_id=106588459]
+offset_left = 60.0
+offset_top = 80.0
+offset_right = 1020.0
+offset_bottom = 200.0
+theme_override_font_sizes/normal_font_size = 40
+text = "AI: Hello, I am Jarvis. Loading your briefings..."
+fit_content = true
+
+[node name="TextureRect" type="TextureRect" parent="SimsSceneNode" unique_id=1172153580]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=629397346]
+
+[node name="Control" type="Control" parent="CanvasLayer" unique_id=2141878760]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Control" unique_id=644220178]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer" unique_id=1393842819]
+layout_mode = 2
+
+[node name="TopSpacer" type="Control" parent="CanvasLayer/Control/MarginContainer/VBoxContainer" unique_id=755286505]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UIContainer" type="PanelContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer" unique_id=792488726]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer" unique_id=686007262]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="TabContainer" type="TabContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer" unique_id=1013632511]
+layout_mode = 2
+current_tab = 0
+
+[node name="Weather" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer" unique_id=1067626329]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Weather" unique_id=1462866869]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Weather data will appear here."
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Weather" unique_id=1884477247]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fetch Weather"
+
+[node name="Calendar" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer" unique_id=104829065]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Calendar" unique_id=585756]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Calendar data will appear here."
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Calendar" unique_id=1108381574]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fetch Calendar"
+
+[node name="Slack" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer" unique_id=977087187]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Slack" unique_id=1890255408]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Slack data will appear here."
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Slack" unique_id=114507553]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fetch Slack"
+
+[node name="Admin" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer" unique_id=1352835473]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Admin" unique_id=1864542006]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Admin dashboard data will appear here."
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Admin" unique_id=622759399]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fetch Admin"
+
+[node name="Presentation" type="VBoxContainer" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer" unique_id=646108697]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="Label" type="RichTextLabel" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Presentation" unique_id=1177634172]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Presentation data will appear here."
+
+[node name="Button" type="Button" parent="CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Presentation" unique_id=264479785]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Fetch Presentation"
