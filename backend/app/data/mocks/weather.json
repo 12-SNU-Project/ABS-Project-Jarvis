@@ -1,0 +1,7 @@
+{
+  "summary": "맑고 일교차가 있어 가벼운 겉옷이 필요합니다.",
+  "temperature_c": 17,
+  "condition": "sunny",
+  "recommendation": "얇은 니트나 셔츠 위에 가벼운 자켓을 추천합니다.",
+  "items": ["light jacket", "shirt", "sneakers"]
+}

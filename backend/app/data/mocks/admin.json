@@ -1,0 +1,51 @@
+{
+  "summary": "현재 mock 기준으로는 슬랙 요약 기능이 가장 많은 토큰을 사용할 가능성이 큽니다.",
+  "top_token_feature": "slack_summary",
+  "metrics": [
+    {
+      "feature": "weather",
+      "owner": "조수빈",
+      "token_estimate": 420,
+      "latency_ms": 180,
+      "status": "healthy"
+    },
+    {
+      "feature": "calendar",
+      "owner": "김재희",
+      "token_estimate": 650,
+      "latency_ms": 220,
+      "status": "healthy"
+    },
+    {
+      "feature": "slack_summary",
+      "owner": "문이현",
+      "token_estimate": 1280,
+      "latency_ms": 510,
+      "status": "watch"
+    },
+    {
+      "feature": "orchestrator",
+      "owner": "배민규",
+      "token_estimate": 300,
+      "latency_ms": 90,
+      "status": "healthy"
+    }
+  ],
+  "flow_nodes": [
+    {"id": "input", "label": "User Input", "group": "entry"},
+    {"id": "weather", "label": "Weather Agent", "group": "feature"},
+    {"id": "calendar", "label": "Calendar Agent", "group": "feature"},
+    {"id": "slack", "label": "Slack Agent", "group": "feature"},
+    {"id": "orchestrator", "label": "Orchestrator", "group": "core"},
+    {"id": "output", "label": "Briefing Output", "group": "exit"}
+  ],
+  "flow_edges": [
+    {"source": "input", "target": "weather", "label": "route"},
+    {"source": "input", "target": "calendar", "label": "route"},
+    {"source": "input", "target": "slack", "label": "route"},
+    {"source": "weather", "target": "orchestrator", "label": "report"},
+    {"source": "calendar", "target": "orchestrator", "label": "report"},
+    {"source": "slack", "target": "orchestrator", "label": "report"},
+    {"source": "orchestrator", "target": "output", "label": "compose"}
+  ]
+}

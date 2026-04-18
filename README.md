@@ -1,15 +1,14 @@
-# SNU12 ABS-AI-AppService
+# Jarvis Multi-Agent MVP
 
 
 <div align="center">
 
 ![Project Status](https://img.shields.io/badge/status-in%20progress-yellow)
-## ABS AI 특강 프로젝트
+
 </div>
 
 ## 프로젝트 소개
-
-
+Professional, typed, and decoupled multi-agent system.
 
 ---
 
@@ -25,24 +24,45 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?style=for-the-badge&logo=langgraph&logoColor=white)
 ---
+## Architecture
 
-## 📁 프로젝트 구조 (업데이트)
+### Backend (`backend/`)
+- **FastAPI**: Modern, high-performance web framework.
+- **Pydantic Schemas**: Strict data contracts between agents and the UI.
+- **Service Layer**: Business logic isolated in `app/services/`. File-or-folder-per-service.
+- **Provider Pattern**: Data fetching (mocks or real APIs) decoupled in `app/providers/`.
+
+### Frontend (`frontend/`)
+- **Feature-Based**: Logic organized by domain features (`briefing`, `admin`).
+
+---
+
+## Directory Structure
 ```
 📦 root
 │
-├── 📂 src/                       # 소스코드
-│   ├── 📂  
-│   ├── 📂 
-│   ├── 📂 
-│   └── 📂 
-├── 📂 data/                      
-├── 📂 docs/
+├── 📂backend/
+│   ├── 📂 app/
+│   │   ├── 📂api/            # Routes and Routers
+│   │   ├── 📂schemas/        # Pydantic Models (The Contracts)
+│   │   ├── 📂services/       # Agent Logic (Team ownership here)
+│   │   ├── 📂providers/      # Data/API Clients
+│   │   └── 📂core/           # Config & Settings
+│   ├── main.py             # Entry point
+│   └── pyproject.toml
+├── 📂frontend/
+│   ├── 📂src/
+│   │   ├── 📂features/       # Feature-based components and APIs
+│   │   ├── 📂components/     # Shared UI Primitives
+│   │   └── 📂types/          # TypeScript definitions
+│   └── package.json
+├──  📂docs/        
 ├── .gitignore
 └──  README.md
 ```
 ---
 
-## 팀원
+## Teammate
 | 이름 | 역할 | GitHub |
 |--------|------|--------|
 | 오승담 | UI | [@seungdam](https://github.com/seungdam) |
@@ -51,17 +71,32 @@
 | 나정연 | 개발 | []() |
 | 문이현 | 개발 | [@dlgus0919](https://github.com/dlgus0919) |
 | 조수빈 | 개발 | [@soobincho-gif](https://github.com/soobincho-gif) |
----
 
-
-## 📊 주요 파이프라인
-
-
-## 📝 데이터 출처
-
+### 구체적인 할당 작업은 TEAM_WORKFLOW.md 참조
 
 ---
-### 커밋 컨벤션
+## Quick Start
+
+### frontend
+
+### Backend
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+uvicorn main:app --reload
+```
+
+---
+### Branch Convention
+- `main`: 최종 Release용 브랜치 
+- `dev`: 개발 작업물 merge용 브랜치
+- `feature/<기능명>`: 기능 작업용 브랜치
+- `bugfix/<이슈명>`: merge 후 발생한 버그 픽스용 브랜치
+
+
+### Commit Convention
 - `feat`: 새로운 기능 추가
 - `fix`: 버그 수정
 - `docs`: 문서 수정

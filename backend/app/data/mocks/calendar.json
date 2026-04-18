@@ -1,0 +1,29 @@
+{
+  "summary": "오전 회의가 몰려 있어 이동 시간을 미리 확인하는 편이 좋습니다.",
+  "events": [
+    {
+      "title": "데일리 스탠드업",
+      "start": "09:30",
+      "end": "10:00",
+      "location": "Zoom",
+      "priority": "high"
+    },
+    {
+      "title": "외부 미팅",
+      "start": "11:00",
+      "end": "12:00",
+      "location": "Gangnam",
+      "priority": "high"
+    },
+    {
+      "title": "기획 리뷰",
+      "start": "15:00",
+      "end": "16:00",
+      "location": "Office",
+      "priority": "medium"
+    }
+  ],
+  "conflicts": [
+    "10:30 출발 기준 외부 미팅 전 이동 버퍼가 15분 정도로 짧습니다."
+  ]
+}
