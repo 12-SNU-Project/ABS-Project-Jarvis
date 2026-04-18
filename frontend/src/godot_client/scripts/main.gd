@@ -1,73 +1,67 @@
-extends Node2D
+extends Control
 
-@onready var chat_bubble = $SimsSceneNode/AIChatBubble
+@onready var chat_bubble = $UI/ChatBubble/MarginContainer/Text
+@onready var ui_card = $UI/CardAnchor/UICard
+@onready var card_anchor = $UI/CardAnchor
+@onready var avatar = $Avatar
 
-# Weather
-@onready var weather_label = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Weather/Label
-@onready var weather_btn = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Weather/Button
+# Buttons
+@onready var weather_btn = $UI/Dock/VBoxContainer/BtnWeather
+@onready var calendar_btn = $UI/Dock/VBoxContainer/BtnCalendar
+@onready var slack_btn = $UI/Dock/VBoxContainer/BtnSlack
+@onready var admin_btn = $UI/Dock/VBoxContainer/BtnAdmin
 
-# Calendar
-@onready var calendar_label = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Calendar/Label
-@onready var calendar_btn = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Calendar/Button
-
-# Slack
-@onready var slack_label = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Slack/Label
-@onready var slack_btn = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Slack/Button
-
-# Admin
-@onready var admin_label = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Admin/Label
-@onready var admin_btn = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Admin/Button
-
-# Presentation
-@onready var presentation_label = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Presentation/Label
-@onready var presentation_btn = $CanvasLayer/Control/MarginContainer/VBoxContainer/UIContainer/MarginContainer/TabContainer/Presentation/Button
-
-# HTTP Request for actual API calls
 var http_request: HTTPRequest
 
 func _ready():
-	# Setup HTTP Request node
 	http_request = HTTPRequest.new()
 	add_child(http_request)
 	http_request.request_completed.connect(_on_request_completed)
 	
-	# Connect buttons
 	weather_btn.pressed.connect(func(): _fetch_mock_data("weather"))
 	calendar_btn.pressed.connect(func(): _fetch_mock_data("calendar"))
 	slack_btn.pressed.connect(func(): _fetch_mock_data("slack"))
 	admin_btn.pressed.connect(func(): _fetch_mock_data("admin"))
-	presentation_btn.pressed.connect(func(): _fetch_mock_data("presentation"))
+	
+	# Close card when clicking outside
+	card_anchor.gui_input.connect(_on_card_anchor_gui_input)
+	# By default, don't block clicks unless card is visible
+	card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _fetch_mock_data(feature: String):
-	chat_bubble.text = "AI: Fetching data for " + feature + "..."
+	chat_bubble.text = "AI: " + feature + " 정보를 불러오는 중입니다..."
 	
-	# Here we would normally make a request to localhost FastAPI
-	# For prototype, we will just simulate a response based on the spec
+	var title = ""
+	var content = ""
 	
-	var mock_response = ""
 	match feature:
 		"weather":
-			mock_response = "{\n  \"owner\": \"조수빈\",\n  \"feature\": \"weather\",\n  \"location\": \"Seoul\",\n  \"temperature_c\": 17,\n  \"summary\": \"Seoul 기준 맑고 일교차가 있어 가벼운 겉옷이 필요합니다.\"\n}"
-			weather_label.text = "Response:\n" + mock_response
+			title = "Weather Briefing"
+			content = "Location: Seoul\nTemperature: 17°C\n\nSummary: 서울 기준 맑고 일교차가 있어 가벼운 겉옷이 필요합니다."
 		"calendar":
-			mock_response = "{\n  \"owner\": \"김재희\",\n  \"feature\": \"calendar\",\n  \"date\": \"2026-04-18\",\n  \"summary\": \"오늘 3개의 일정이 있습니다.\"\n}"
-			calendar_label.text = "Response:\n" + mock_response
+			title = "Schedule Briefing"
+			content = "Date: 2026-04-18\n\n오늘 3개의 일정이 있습니다:\n1. 10:00 AM - 주간 회의\n2. 1:00 PM - 클라이언트 미팅\n3. 4:00 PM - 프로젝트 리뷰"
 		"slack":
-			mock_response = "{\n  \"owner\": \"문이현\",\n  \"feature\": \"slack\",\n  \"summary\": \"읽지 않은 메시지 요약입니다.\"\n}"
-			slack_label.text = "Response:\n" + mock_response
+			title = "Slack Summary"
+			content = "읽지 않은 메시지 요약:\n\n- 디자인팀: '에셋 전달드렸습니다.'\n- 개발팀: '백엔드 API 배포 완료되었습니다.'"
 		"admin":
-			mock_response = "{\n  \"owner\": \"나정연\",\n  \"feature\": \"admin\",\n  \"summary\": \"시스템 지표 상태입니다.\"\n}"
-			admin_label.text = "Response:\n" + mock_response
-		"presentation":
-			mock_response = "{\n  \"owner\": \"오승담\",\n  \"feature\": \"presentation\",\n  \"demo_title\": \"Jarvis MVP Demo\",\n  \"closing_message\": \"감사합니다.\"\n}"
-			presentation_label.text = "Response:\n" + mock_response
+			title = "Admin Dashboard"
+			content = "시스템 지표 상태:\n- CPU 사용량: 45%\n- 메모리 사용량: 60%\n- 모든 서비스 정상 작동 중."
 			
-	chat_bubble.text = "AI: Received JSON data for " + feature + ". Check the UI panel below."
+	chat_bubble.text = "AI: " + feature + " 데이터를 요약해 드립니다."
+	
+	# Enable blocking clicks outside the card
+	card_anchor.mouse_filter = Control.MOUSE_FILTER_STOP
+	ui_card.show_card(title, content)
+	avatar.move_to_left()
+
+func _on_card_anchor_gui_input(event):
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		ui_card.hide_card()
+		avatar.move_to_center()
+		# Stop blocking clicks so we can use buttons again
+		card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _on_request_completed(result, response_code, headers, body):
-	# Example handler for actual backend connection
 	if response_code == 200:
-		var json = JSON.new()
-		var parse_result = json.parse(body.get_string_from_utf8())
-		if parse_result == OK:
-			chat_bubble.text = "AI: Backend data received successfully!"
+		pass
