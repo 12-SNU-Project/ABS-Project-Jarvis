@@ -42,10 +42,32 @@ class SlackChannelSummary(BaseModel):
     summary: str
     action_items: List[str] = []
 
+class SlackMessage(BaseModel):
+    user: str
+    text: str
+    ts: str
+
 class SlackBrief(FeatureResponse):
     date: str
     summary: str
     channels: List[SlackChannelSummary]
+
+class SlackSummaryRequest(BaseModel):
+    channel_id: str = Field(min_length=1, description="Slack channel ID such as C0123456789")
+    user_input: str = Field(default="최근 1일 대화 핵심만 5줄로 요약해줘")
+    date: Optional[str] = Field(default=None, description="브리핑 기준 날짜")
+    lookback_hours: int = Field(default=24, ge=1, le=168, description="몇 시간치 메시지를 읽을지")
+
+class SlackSummaryResponse(FeatureResponse):
+    date: str
+    channel_id: str
+    channel_name: str
+    lookback_hours: int
+    message_count: int
+    summary: str
+    summary_lines: List[str]
+    messages: List[SlackMessage]
+    model: str
 
 # --- Admin (나정연) ---
 
