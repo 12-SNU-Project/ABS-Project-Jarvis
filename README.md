@@ -1,89 +1,215 @@
-# Jarvis Assistant Skeleton
+# Jarvis Multi-Agent Python Skeleton
 
-6명이 병렬로 개발하고 마지막에 머지하기 쉽게 만든 AI 비서 프로젝트 뼈대입니다.
+6명이 병렬로 개발하기 쉬운 Python 기반 멀티 에이전트 프로젝트 뼈대입니다.
 
-## 목표 기능
+이 프로젝트의 원칙은 하나입니다.
 
-- UI: 메인 브리핑 화면, 기능 카드, 상태 확인
-- Admin: 토큰 사용량 / 에이전트 흐름 / 기능별 실행 상태
-- 발표: 데모 시나리오 및 발표용 카드/스크립트
-- 날씨 + 옷 추천
-- 일정 브리핑
-- 슬랙 요약
-- 오케스트레이션: 자연어 입력 하나로 여러 기능을 묶어 브리핑 생성
+- 각 사람은 자기 파일 하나만 보고 개발할 수 있어야 합니다.
 
-## 구조
-
-```text
-apps/
-  web/                    # 프론트엔드 및 데모 화면
-    app/                  # Next.js route
-    team/                 # 사람별 폴더
-      baemingyu-orchestrator/
-      oseungdam-ui/
-      najeongyeon-admin/
-      josubin-weather/
-      kimjaehee-calendar/
-      moonihyeon-slack/
-```
-
-## 권장 역할 분배
-
-- 배민규: `apps/web/team/baemingyu-orchestrator/*`
-- 오승담: `apps/web/team/oseungdam-ui/*`
-- 나정연: `apps/web/team/najeongyeon-admin/*`
-- 조수빈: `apps/web/team/josubin-weather/*`
-- 김재희: `apps/web/team/kimjaehee-calendar/*`
-- 문이현: `apps/web/team/moonihyeon-slack/*`
-
-## 머지 충돌 줄이는 규칙
-
-- 각자 담당 폴더 바깥 수정은 최소화합니다.
-- 공통 타입 수정은 `apps/web/team/common.ts` 한 곳에서만 합니다.
-- 사람별 구현은 각자 폴더 `index.ts`에서 먼저 끝냅니다.
-- UI 연결은 mock 데이터 기반으로 먼저 완성한 뒤 실제 API를 붙입니다.
-- 사람 폴더끼리는 함수 호출로 직접 연결합니다.
-
-## 개발 순서 제안
-
-1. 각 사람은 자기 폴더 `index.ts`에서 mock을 실제 API로 바꿉니다.
-2. 배민규 폴더가 각 결과를 받아 최종 브리핑으로 합칩니다.
-3. 오승담은 브리핑 결과를 화면으로 표현합니다.
-4. 나정연은 사람별 토큰/흐름 데이터를 Admin으로 시각화합니다.
-
-## 실전 연결 포인트
-
-- `apps/web/team/josubin-weather/index.ts`: 날씨 API 연결
-- `apps/web/team/kimjaehee-calendar/index.ts`: 캘린더 연결
-- `apps/web/team/moonihyeon-slack/index.ts`: Slack + 생성형 AI 연결
-- `apps/web/team/baemingyu-orchestrator/index.ts`: 결과 조합
-- `apps/web/app/api/briefing/route.ts`: 외부 호출용 브리핑 API
-- `apps/web/app/api/admin/summary/route.ts`: Admin 데이터 API
-- `.env.example`: 팀 공용 환경변수 기준
-
-## 팀플 문서
-
-- 작업 규칙: `docs/TEAM_WORKFLOW.md`
-- 사람별 입출력 정리: `docs/PERSON_FOLDER_HANDOFF.md`
-
-## 참고
-
-- 기존에 만들어 둔 세분화된 `packages/*` 구조는 참고용으로 남아 있습니다.
-- 실제 팀플 진행 기준은 `apps/web/team/*` 입니다.
-
-## 추후 연결 포인트
-
-- Google Calendar / Gmail
-- Slack API
-- Weather API
-- LLM provider SDK
-- Scheduler or cron
-
-## 실행 예정 명령
+## 빠른 시작
 
 ```bash
-npm install
-npm run dev:web
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+uvicorn jarvis.main:app --reload
 ```
 
-`pnpm`을 써도 되지만, 현재 스캐폴딩은 `npm workspaces` 기준으로도 바로 동작하도록 맞춰두었습니다.
+확인할 API는 아래 4개입니다.
+
+- `GET /health`
+- `POST /briefing`
+- `GET /admin/summary`
+- `GET /presentation/demo`
+
+## 파일 구조
+
+```text
+src/jarvis/
+  api/
+    routes.py
+  core/
+    config.py
+    mock_loader.py
+  team/
+    orchestrator.py
+    weather.py
+    calendar.py
+    slack_summary.py
+    admin.py
+    presentation.py
+  data/mocks/
+    weather.json
+    calendar.json
+    slack.json
+    admin.json
+    presentation.json
+```
+
+## 사람별 담당 파일
+
+- 배민규: `src/jarvis/team/orchestrator.py`
+- 조수빈: `src/jarvis/team/weather.py`
+- 김재희: `src/jarvis/team/calendar.py`
+- 문이현: `src/jarvis/team/slack_summary.py`
+- 나정연: `src/jarvis/team/admin.py`
+- 오승담: `src/jarvis/team/presentation.py`
+
+## 사람별 입력과 출력
+
+중요한 원칙이 하나 더 있습니다.
+
+- 시간이 부족하면 모든 사람은 먼저 자기 mock 데이터를 기준으로 기능을 완성합니다.
+- 실제 API나 실데이터 연결은 그 다음 단계입니다.
+- 특히 Admin과 Demo는 처음부터 mock 기준으로 만드는 것이 맞습니다.
+
+### 배민규 - 오케스트레이터
+
+- 파일: `src/jarvis/team/orchestrator.py`
+- 입력:
+  - `user_input: str`
+  - `location: str`
+  - `date: str`
+  - `user_name: str`
+- 출력:
+  - 최종 브리핑 `dict`
+- 해야 하는 일:
+  - 다른 사람 함수들을 호출해서 결과를 합치기
+  - `headline`, `final_summary` 같은 최종 문장 만들기
+  - 필요하면 나중에 스케줄링, 실패 처리, 조건 분기 추가
+
+### 조수빈 - 날씨 + 옷 추천
+
+- 파일: `src/jarvis/team/weather.py`
+- 1차 기준 목업: `src/jarvis/data/mocks/weather.json`
+- 입력:
+  - `location: str`
+  - `date: str`
+- 출력:
+  - 아래 키를 가진 `dict`
+  - `owner`
+  - `feature`
+  - `location`
+  - `date`
+  - `summary`
+  - `temperature_c`
+  - `condition`
+  - `recommendation`
+  - `items`
+  - `uses_mock`
+- 해야 하는 일:
+  - mock 대신 실제 날씨 API 연결
+  - 날씨 결과를 기반으로 옷 추천 문장 만들기
+  - 시간이 없으면 mock 데이터 형식만 더 현실적으로 다듬어도 충분함
+
+### 김재희 - 일정 브리핑
+
+- 파일: `src/jarvis/team/calendar.py`
+- 1차 기준 목업: `src/jarvis/data/mocks/calendar.json`
+- 입력:
+  - `date: str`
+- 출력:
+  - 아래 키를 가진 `dict`
+  - `owner`
+  - `feature`
+  - `date`
+  - `summary`
+  - `events`
+  - `conflicts`
+  - `uses_mock`
+- 해야 하는 일:
+  - mock 대신 실제 일정 데이터 연결
+  - 일정 요약 문장 만들기
+  - 겹치는 일정이나 이동 위험 같은 conflict 만들기
+  - 시간이 없으면 mock 일정 데이터만 더 현실적으로 다듬어도 충분함
+
+### 문이현 - 슬랙 요약
+
+- 파일: `src/jarvis/team/slack_summary.py`
+- 1차 기준 목업: `src/jarvis/data/mocks/slack.json`
+- 입력:
+  - `user_input: str`
+  - `date: str`
+- 출력:
+  - 아래 키를 가진 `dict`
+  - `owner`
+  - `feature`
+  - `date`
+  - `summary`
+  - `channels`
+  - `uses_mock`
+- 해야 하는 일:
+  - mock 대신 Slack 메시지 수집으로 교체
+  - 필요한 채널 요약 만들기
+  - action item이 필요하면 `channels` 안에 넣기
+  - 시간이 없으면 mock 메시지와 요약 품질만 높여도 충분함
+
+### 나정연 - Admin
+
+- 파일: `src/jarvis/team/admin.py`
+- 1차 기준 목업: `src/jarvis/data/mocks/admin.json`
+- 입력:
+  - 현재 없음
+- 출력:
+  - 아래 키를 가진 `dict`
+  - `owner`
+  - `feature`
+  - `summary`
+  - `top_token_feature`
+  - `metrics`
+  - `flow_nodes`
+  - `flow_edges`
+  - `uses_mock`
+- 해야 하는 일:
+  - 먼저 mock 데이터를 기준으로 Admin 응답과 화면 구성을 완성
+  - 이후 가능하면 실제 로그/토큰 데이터로 교체
+  - 어떤 기능이 무거운지 보여주는 데이터 만들기
+  - 에이전트 흐름 시각화용 노드/엣지 데이터 만들기
+  - 즉, 처음에는 운영 데이터가 없어도 괜찮고 mock 기준으로 만드는 게 맞음
+
+### 오승담 - 발표 / 데모
+
+- 파일: `src/jarvis/team/presentation.py`
+- 1차 기준 목업: `src/jarvis/data/mocks/presentation.json`
+- 입력:
+  - 현재 없음
+- 출력:
+  - 아래 키를 가진 `dict`
+  - `owner`
+  - `feature`
+  - `demo_title`
+  - `cards`
+  - `closing_message`
+  - `uses_mock`
+- 해야 하는 일:
+  - 먼저 mock 데이터를 기준으로 발표 흐름과 카드 구성을 완성
+  - 이후 가능하면 실제 발표 흐름 또는 UI 연결 데이터로 교체
+  - 발표에서 보여줄 카드와 설명 문구 만들기
+  - 즉, 처음에는 실사용 데이터가 아니라 발표용 시나리오 목업을 만드는 게 맞음
+
+## API 입력 예시
+
+`POST /briefing`
+
+```json
+{
+  "user_input": "오늘 외근 가기 전에 전체 브리핑 해줘",
+  "location": "Seoul",
+  "date": "2026-04-18",
+  "user_name": "Team Jarvis"
+}
+```
+
+## 팀 작업 규칙
+
+- 각 사람은 자기 파일 하나만 우선 수정합니다.
+- 복잡한 추상화, base class, interface는 넣지 않습니다.
+- 반환값은 `dict`로 유지합니다.
+- 다른 사람 코드와 직접 연결하지 않습니다.
+- 최종 조합은 `orchestrator.py`에서만 합니다.
+- 실데이터가 없으면 mock 데이터를 기준으로 먼저 완성합니다.
+
+## 참고 문서
+
+- 상세 작업 규칙: `docs/TEAM_WORKFLOW.md`
+- 사람별 입력/출력 계약: `docs/INPUT_OUTPUT_SPEC.md`
