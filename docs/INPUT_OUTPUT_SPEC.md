@@ -13,14 +13,14 @@
 ## 1. 오케스트레이터
 
 - 담당자: 배민규
-- 파일: `src/jarvis/team/orchestrator.py`
-- 함수: `create_briefing(user_input: str, location: str, date: str, user_name: str) -> dict`
+- 파일: `backend/app/services/orchestrator.py`
+- 함수: `create_briefing(user_input: str, location: str, date: str, user_name: str) -> FinalBriefing`
 - 참고 목업:
-  - weather: `src/jarvis/data/mocks/weather.json`
-  - calendar: `src/jarvis/data/mocks/calendar.json`
-  - slack: `src/jarvis/data/mocks/slack.json`
-  - admin: `src/jarvis/data/mocks/admin.json`
-  - presentation: `src/jarvis/data/mocks/presentation.json`
+  - weather: `backend/app/data/mocks/weather.json`
+  - calendar: `backend/app/data/mocks/calendar.json`
+  - slack: `backend/app/data/mocks/slack.json`
+  - admin: `backend/app/data/mocks/admin.json`
+  - presentation: `backend/app/data/mocks/presentation.json`
 
 입력
 
@@ -61,9 +61,9 @@
 ## 2. 날씨 + 옷 추천
 
 - 담당자: 조수빈
-- 파일: `src/jarvis/team/weather.py`
-- 함수: `get_weather_brief(location: str, date: str) -> dict`
-- 참고 목업: `src/jarvis/data/mocks/weather.json`
+- 파일: `backend/app/services/weather.py`
+- 함수: `get_weather_brief(location: str, date: str) -> WeatherBrief`
+- 참고 목업: `backend/app/data/mocks/weather.json`
 
 입력
 
@@ -113,9 +113,9 @@
 ## 3. 일정 브리핑
 
 - 담당자: 김재희
-- 파일: `src/jarvis/team/calendar.py`
-- 함수: `get_calendar_brief(date: str) -> dict`
-- 참고 목업: `src/jarvis/data/mocks/calendar.json`
+- 파일: `backend/app/services/calendar.py`
+- 함수: `get_calendar_brief(date: str) -> CalendarBrief`
+- 참고 목업: `backend/app/data/mocks/calendar.json`
 
 입력
 
@@ -150,9 +150,9 @@
 ## 4. 슬랙 요약
 
 - 담당자: 문이현
-- 파일: `src/jarvis/team/slack_summary.py`
-- 함수: `get_slack_brief(user_input: str, date: str) -> dict`
-- 참고 목업: `src/jarvis/data/mocks/slack.json`
+- 파일: `backend/app/services/slack_summary.py`
+- 함수: `get_slack_brief(user_input: str, date: str) -> [FeatureModel]`
+- 참고 목업: `backend/app/data/mocks/slack.json`
 
 입력
 
@@ -185,9 +185,9 @@
 ## 5. Admin
 
 - 담당자: 나정연
-- 파일: `src/jarvis/team/admin.py`
-- 함수: `get_admin_summary() -> dict`
-- 참고 목업: `src/jarvis/data/mocks/admin.json`
+- 파일: `backend/app/services/admin.py`
+- 함수: `get_admin_summary() -> [FeatureModel]`
+- 참고 목업: `backend/app/data/mocks/admin.json`
 
 입력
 
@@ -238,9 +238,9 @@
 ## 6. 발표 / 데모
 
 - 담당자: 오승담
-- 파일: `src/jarvis/team/presentation.py`
-- 함수: `get_presentation_demo() -> dict`
-- 참고 목업: `src/jarvis/data/mocks/presentation.json`
+- 파일: `backend/app/services/presentation.py`
+- 함수: `get_presentation_demo() -> [FeatureModel]`
+- 참고 목업: `backend/app/data/mocks/presentation.json`
 
 입력
 

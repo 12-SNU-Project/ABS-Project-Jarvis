@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from jarvis.core.mock_loader import load_mock
+from app.providers.mock_provider import load_mock
 
 
 def get_slack_brief(user_input: str, date: str) -> dict:

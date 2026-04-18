@@ -9,12 +9,12 @@
 
 ## 파일 오너십
 
-- 배민규: `src/jarvis/team/orchestrator.py`
-- 조수빈: `src/jarvis/team/weather.py`
-- 김재희: `src/jarvis/team/calendar.py`
-- 문이현: `src/jarvis/team/slack_summary.py`
-- 나정연: `src/jarvis/team/admin.py`
-- 오승담: `src/jarvis/team/presentation.py`
+- 배민규: `backend/app/services/orchestrator.py`
+- 조수빈: `backend/app/services/weather.py`
+- 김재희: `backend/app/services/calendar.py`
+- 문이현: `backend/app/services/slack_summary.py`
+- 나정연: `backend/app/services/admin.py`
+- 오승담: `backend/app/services/presentation.py`
 
 ## 공통 규칙
 
