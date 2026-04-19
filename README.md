@@ -15,14 +15,19 @@ Professional, typed, and decoupled multi-agent system.
 ## 🛠 기술 스택
 ### 
 ### 사용 언어
-![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 
 ### Tools
-![Conda](https://img.shields.io/badge/Anaconda-44A833?style=for-the-badge&logo=anaconda&logoColor=white)
-![ChromaDB](https://img.shields.io/badge/ChromaDB-004A7C?style=for-the-badge&logo=google-cloud&logoColor=white) 
-![Cursor](https://img.shields.io/badge/cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?style=for-the-badge&logo=langgraph&logoColor=white)
+[![Anaconda](https://img.shields.io/badge/Anaconda-44A833?style=for-the-badge&logo=anaconda&logoColor=white)](https://www.anaconda.com/)
+[![ChromaDB](https://img.shields.io/badge/ChromaDB-004A7C?style=for-the-badge&logo=google-cloud&logoColor=white)](https://www.trychroma.com/)
+[![Cursor](https://img.shields.io/badge/Cursor-000000?style=for-the-badge&logo=cursor&logoColor=white)](https://www.cursor.com/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?style=for-the-badge&logo=langgraph&logoColor=white)](https://www.langchain.com/langgraph)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://platform.openai.com/docs/overview)
+[![Uvicorn](https://img.shields.io/badge/Uvicorn-4051B5?style=for-the-badge&logo=python&logoColor=white)](https://www.uvicorn.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=for-the-badge&logo=pytest&logoColor=white)](https://docs.pytest.org/)
+[![HTTPX](https://img.shields.io/badge/HTTPX-5A29E4?style=for-the-badge)](https://www.python-httpx.org/)
+
 ---
 ## Architecture
 
