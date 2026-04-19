@@ -70,11 +70,11 @@ Professional, typed, and decoupled multi-agent system.
 ## Teammate
 | 이름 | 역할 | GitHub |
 |--------|------|--------|
-| 오승담 | UI/메인테이너 | [@seungdam](https://github.com/seungdam) |
+| 오승담 | UI / 메인테이너 | [@seungdam](https://github.com/seungdam) |
 | 배민규 | 개발 | [@yachom](https://github.com/yachom) |
-| 김재희 | Mail 연동/메인테이너 | [@RekHet](https://github.com/RekHet) |
-| 나정연 | Admin | [@njungyeon](https://github.com/njungyeon) |
-| 문이현 | Slack | [@dlgus0919](https://github.com/dlgus0919) |
+| 김재희 | Google OAuth / Schedule Features / 메인테이너 | [@RekHet](https://github.com/RekHet) |
+| 나정연 | Admin Features | [@njungyeon](https://github.com/njungyeon) |
+| 문이현 | Slack Integration | [@dlgus0919](https://github.com/dlgus0919) |
 | 조수빈 | Weather + 옷 추천 | [@soobincho-gif](https://github.com/soobincho-gif) |
 
 ### 구체적인 할당 작업은 TEAM_WORKFLOW.md 참조
