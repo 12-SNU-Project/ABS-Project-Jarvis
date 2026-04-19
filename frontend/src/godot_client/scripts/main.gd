@@ -4,7 +4,8 @@ extends Control
 @onready var ui_card = $UI/CardAnchor/UICard
 @onready var slack_panel = $UI/CardAnchor/SlackDemoPanel
 @onready var card_anchor = $UI/CardAnchor
-@onready var avatar = $Avatar
+@onready var avatar = $TopZone/Avatar
+@onready var chat_bubble = $UI/ChatBubble
 
 # Buttons
 @onready var weather_btn = $UI/Dock/VBoxContainer/BtnWeather
@@ -15,6 +16,7 @@ extends Control
 var http_request: HTTPRequest
 var active_card = null
 var is_switching = false
+var current_feature = ""
 
 func _ready():
 	http_request = HTTPRequest.new()
@@ -28,11 +30,24 @@ func _ready():
 	
 	card_anchor.gui_input.connect(_on_card_anchor_gui_input)
 	card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slack_panel.summary_loaded.connect(_on_slack_summary_loaded)
 
 func _fetch_mock_data(feature: String):
 	if is_switching:
 		return
+	if current_feature == feature and active_card != null:
+		is_switching = true
+		active_card.hide_card()
+		await active_card.card_closed
+		active_card = null
+		current_feature = ""
+		avatar.reset_anim()
+		chat_bubble.set_text("AI: 무엇을 도와드릴까요?", 4.0)
+		is_switching = false
+		return
+		
 	is_switching = true
+	current_feature = feature
 	
 	# Hide existing card
 	if active_card:
@@ -42,7 +57,7 @@ func _fetch_mock_data(feature: String):
 		avatar.reset_anim()
 	
 	# ── Thinking state ────────────────────────────────────────────────────────
-	ui_layer.show_thinking()
+	chat_bubble.show_thinking()
 	avatar.react_thinking()
 	
 	var title = ""
@@ -59,16 +74,13 @@ func _fetch_mock_data(feature: String):
 			content = "Date: 2026-04-18\n\n오늘 3개의 일정이 있습니다:\n1. 10:00 AM - 주간 회의\n2. 1:00 PM - 클라이언트 미팅\n3. 4:00 PM - 프로젝트 리뷰"
 			summary_line = "오늘 일정 3개를 요약해 드렸습니다."
 		"slack":
-			ui_layer.set_text("AI: Slack 데모 패널을 엽니다.")
 			card_anchor.mouse_filter = Control.MOUSE_FILTER_STOP
 			slack_panel.show_card()
 			active_card = slack_panel
-			# ── Card open reaction ─────────────────────────────────────────
-			avatar.move_for_panel(slack_panel)
+			# Panel slides from BOTTOM — avatar stays at x=20, no X shift needed
 			avatar.react_card_open()
-			# Speak after card lands
 			await get_tree().create_timer(0.7).timeout
-			ui_layer.set_text("AI: Slack 채널을 확인해 보세요!", 5.0)
+			chat_bubble.set_text("AI: Slack 채널을 입력하고 요약을 요청하세요.", 6.0)
 			avatar.react_speaking()
 			is_switching = false
 			return
@@ -81,13 +93,12 @@ func _fetch_mock_data(feature: String):
 	ui_card.show_card(title, content)
 	active_card = ui_card
 	
-	# ── Card open reaction ─────────────────────────────────────────────────
-	avatar.move_for_panel(ui_card)
+	# TopZone avatar stays fixed — BottomZone panel rises from below
 	avatar.react_card_open()
 	
 	# ── Speaking after card lands (0.7s = card slide-in duration) ─────────
 	await get_tree().create_timer(0.7).timeout
-	ui_layer.set_text("AI: " + summary_line, 5.0)
+	chat_bubble.set_text("AI: " + summary_line, 5.0)
 	avatar.react_speaking()
 	
 	is_switching = false
@@ -97,9 +108,13 @@ func _on_card_anchor_gui_input(event):
 		if active_card and not is_switching:
 			active_card.hide_card()
 			active_card = null
-			avatar.move_for_panel(null)
+			current_feature = ""
 			avatar.reset_anim()
 			card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+func _on_slack_summary_loaded(channel_name: String, msg_count: int):
+	avatar.react_speaking()
+	chat_bubble.set_text("AI: %s의 메시지 %d개를 요약했습니다!" % [channel_name, msg_count], 6.0)
 
 func _on_request_completed(result, response_code, headers, body):
 	if response_code == 200:

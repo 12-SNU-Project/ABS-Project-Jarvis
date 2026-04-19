@@ -19,12 +19,16 @@ var _anim_tween: Tween = null
 func _ready():
 	if avatar_texture:
 		texture = avatar_texture
-	pivot_offset = size / 2.0       # rotate/scale from center
 	call_deferred("_init_base_pos")
 
 func _init_base_pos():
-	base_x = position.x
+	await get_tree().process_frame
+	var screen = get_viewport_rect().size
+	# Center horizontally within TopZone (exclude 148px dock on right)
+	var avail_w = screen.x - 148.0
+	base_x = (avail_w - size.x) / 2.0
 	base_y = position.y
+	position.x = base_x
 	pivot_offset = size / 2.0
 
 func _process(delta):
