@@ -1,0 +1,218 @@
+[gd_scene format=3 uid="uid://51yptvfp4rii"]
+
+[ext_resource type="Script" uid="uid://diby3wnc68cbq" path="res://scripts/core/main_scene.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://d0880rybn1dnh" path="res://scripts/components/bubble_chat.gd" id="2_bubble"]
+[ext_resource type="PackedScene" path="res://scenes/panels/calendar_panel.tscn" id="3_cal"]
+[ext_resource type="PackedScene" path="res://scenes/panels/slack_panel.tscn" id="4_slack"]
+[ext_resource type="PackedScene" path="res://scenes/components/chatbot_avatar.tscn" id="5_avatar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
+content_margin_left = 18.0
+content_margin_top = 12.0
+content_margin_right = 18.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.78, 0.98, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 4
+shadow_color = Color(0.35, 0.55, 0.8, 0.22)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dock"]
+content_margin_left = 0.0
+content_margin_top = 8.0
+content_margin_right = 0.0
+content_margin_bottom = 8.0
+bg_color = Color(1, 1, 1, 0.88)
+border_width_left = 2
+border_color = Color(0.72, 0.87, 0.98, 1)
+shadow_color = Color(0.35, 0.55, 0.8, 0.18)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.93, 0.96, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.22, 0.53, 0.95, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_hover"]
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+bg_color = Color(0.78, 0.9, 1, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="MainScene" type="Control" unique_id=894204678]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1382997339]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.88, 0.94, 0.99, 1)
+
+[node name="BGAccent" type="ColorRect" parent="." unique_id=151577111]
+layout_mode = 0
+offset_left = -100.0
+offset_top = 500.0
+offset_right = 700.0
+offset_bottom = 1000.0
+rotation = -0.28
+color = Color(0.76, 0.89, 0.98, 0.38)
+
+[node name="TopZone" type="Control" parent="." unique_id=797492201]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = -152.0
+offset_bottom = 300.0
+grow_horizontal = 2
+
+[node name="Avatar" parent="TopZone" unique_id=250155765 instance=ExtResource("5_avatar")]
+position = Vector2(550, 150)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1092954602]
+
+[node name="ChatBubble" type="PanelContainer" parent="UI" unique_id=1355947348]
+visible = false
+offset_left = 24.0
+offset_top = 60.0
+offset_right = 320.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bubble")
+script = ExtResource("2_bubble")
+
+[node name="ChatDelayer" type="Timer" parent="UI/ChatBubble" unique_id=741764001]
+
+[node name="BubbleMargin" type="MarginContainer" parent="UI/ChatBubble" unique_id=1373187560]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="BubbleChat" type="RichTextLabel" parent="UI/ChatBubble/BubbleMargin" unique_id=1955398243]
+layout_mode = 2
+theme_override_colors/default_color = Color(0.15, 0.25, 0.48, 1)
+theme_override_font_sizes/normal_font_size = 14
+text = "AI: 안녕하세요!"
+fit_content = true
+
+[node name="Dock" type="PanelContainer" parent="UI" unique_id=813031054]
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -152.0
+offset_bottom = -360.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dock")
+
+[node name="DockMargin" type="MarginContainer" parent="UI/Dock" unique_id=604628845]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="UI/Dock/DockMargin" unique_id=1123245213]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BtnWeather" type="Button" parent="UI/Dock/DockMargin/VBox" unique_id=1927852459]
+custom_minimum_size = Vector2(112, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.4, 0.72, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "☀
+Weather"
+
+[node name="BtnCalendar" type="Button" parent="UI/Dock/DockMargin/VBox" unique_id=218384245]
+custom_minimum_size = Vector2(112, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.4, 0.72, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "📅
+Calendar"
+
+[node name="BtnSlack" type="Button" parent="UI/Dock/DockMargin/VBox" unique_id=536469937]
+custom_minimum_size = Vector2(112, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.4, 0.72, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "💬
+Slack"
+
+[node name="BtnAdmin" type="Button" parent="UI/Dock/DockMargin/VBox" unique_id=714274407]
+custom_minimum_size = Vector2(112, 72)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.4, 0.72, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_hover")
+text = "⚙
+Admin"
+
+[node name="CardAnchor" type="Control" parent="UI" unique_id=1196184467]
+layout_mode = 3
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 23.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 1
+
+[node name="SlackPanel" parent="UI/CardAnchor" unique_id=99573441 instance=ExtResource("4_slack")]
+visible = false
+layout_mode = 1
+
+[node name="CalendarPanel" parent="UI/CardAnchor" unique_id=1753404465 instance=ExtResource("3_cal")]
+visible = false
+layout_mode = 1

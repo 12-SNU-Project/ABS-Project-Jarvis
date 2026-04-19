@@ -1,0 +1,253 @@
+[gd_scene format=3 uid="uid://dgv4ljx77j4mx"]
+
+[ext_resource type="Script" uid="uid://cdoy2iw55h8ud" path="res://scripts/panels/slack_panel.gd" id="1_slack"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.98, 0.99, 1, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+shadow_color = Color(0.35, 0.52, 0.75, 0.15)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+content_margin_left = 16.0
+content_margin_top = 4.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+bg_color = Color(0.88, 0.94, 1, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+bg_color = Color(0.95, 0.97, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.88, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_summary_bg"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.92, 1, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.25, 0.55, 0.95, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="SlackPanel" type="PanelContainer" unique_id=2083036700]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_slack")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1825769872]
+
+[node name="HTTPRequestHealth" type="HTTPRequest" parent="." unique_id=1563566622]
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=2133325169]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=915078824]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1699003558]
+layout_mode = 2
+
+[node name="TitleBadge" type="Label" parent="Margin/VBox/HeaderRow" unique_id=11002168]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.4, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+text = "💬  Slack Summary"
+
+[node name="Spacer" type="Control" parent="Margin/VBox/HeaderRow" unique_id=1230864420]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusLabel" type="Label" parent="Margin/VBox/HeaderRow" unique_id=2068670009]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "● Connected"
+
+[node name="ContentRow" type="HBoxContainer" parent="Margin/VBox" unique_id=1509795685]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="LeftCol" type="VBoxContainer" parent="Margin/VBox/ContentRow" unique_id=95761226]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+
+[node name="PromptBox" type="VBoxContainer" parent="Margin/VBox/ContentRow/LeftCol" unique_id=618367412]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.5
+theme_override_constants/separation = 4
+
+[node name="PromptTitle" type="Label" parent="Margin/VBox/ContentRow/LeftCol/PromptBox" unique_id=1600939796]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.45, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "Custom Prompt"
+
+[node name="PromptEdit" type="TextEdit" parent="Margin/VBox/ContentRow/LeftCol/PromptBox" unique_id=2119348303]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "최근 대화 핵심 요약"
+wrap_mode = 1
+
+[node name="SummaryTitle" type="Label" parent="Margin/VBox/ContentRow/LeftCol" unique_id=1598285]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.45, 0.65, 1)
+theme_override_font_sizes/font_size = 13
+text = "Core Summary"
+
+[node name="SummaryPanel" type="PanelContainer" parent="Margin/VBox/ContentRow/LeftCol" unique_id=1053461055]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_summary_bg")
+
+[node name="SummaryScroll" type="ScrollContainer" parent="Margin/VBox/ContentRow/LeftCol/SummaryPanel" unique_id=366273419]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="SummaryList" type="VBoxContainer" parent="Margin/VBox/ContentRow/LeftCol/SummaryPanel/SummaryScroll" unique_id=833531985]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="RightCol" type="VBoxContainer" parent="Margin/VBox/ContentRow" unique_id=1988174570]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="QueryBox" type="VBoxContainer" parent="Margin/VBox/ContentRow/RightCol" unique_id=728738547]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="QueryTitle" type="Label" parent="Margin/VBox/ContentRow/RightCol/QueryBox" unique_id=424384423]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.45, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "Configuration"
+
+[node name="Grid" type="GridContainer" parent="Margin/VBox/ContentRow/RightCol/QueryBox" unique_id=1668570974]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="ChanLbl" type="Label" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=1808793886]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 10
+text = "Channel"
+
+[node name="ChannelEdit" type="LineEdit" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=276526747]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "Code"
+max_length = 10
+
+[node name="DateLbl" type="Label" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=1848915629]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 10
+text = "Date"
+
+[node name="DateEdit" type="LineEdit" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=215450404]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "2026-04-19"
+
+[node name="HoursLbl" type="Label" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=803658001]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 10
+text = "Lookback"
+
+[node name="HoursSpin" type="SpinBox" parent="Margin/VBox/ContentRow/RightCol/QueryBox/Grid" unique_id=823106952]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 24.0
+suffix = "h"
+
+[node name="SubmitBtn" type="Button" parent="Margin/VBox/ContentRow/RightCol" unique_id=327688194]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "불러오기"
+
+[node name="RawBox" type="VBoxContainer" parent="Margin/VBox/ContentRow/RightCol" unique_id=175942507]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 4
+
+[node name="RawTitle" type="Label" parent="Margin/VBox/ContentRow/RightCol/RawBox" unique_id=884361063]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.45, 0.65, 1)
+theme_override_font_sizes/font_size = 11
+text = "Raw Messages"
+
+[node name="RawScroll" type="ScrollContainer" parent="Margin/VBox/ContentRow/RightCol/RawBox" unique_id=1768937139]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MsgList" type="VBoxContainer" parent="Margin/VBox/ContentRow/RightCol/RawBox/RawScroll" unique_id=1966026221]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="StatusBanner" type="Label" parent="Margin/VBox" unique_id=71807490]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.35, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+text = "Error placeholder"
+autowrap_mode = 2
