@@ -1,9 +1,16 @@
 from __future__ import annotations
-from collections import defaultdict
+from datetime import datetime, timezone
 
 from app.providers.mock_provider import load_mock
 from .logging_service import get_recent_feature_runs
 from .sqlite import init_db
+
+
+def parse_created_at(s):
+    dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def get_admin_summary() -> dict:
@@ -42,36 +49,67 @@ def get_admin_summary() -> dict:
             "uses_mock": True,
         }
 
-    # 집계: 예시(실제 요구에 맞게 수정 가능)
-    owner = logs[0]["owner"] if logs else "나정연"
-    feature = logs[0]["feature"] if logs else "admin"
-    summary = f"최근 {len(logs)}회 실행, 총 토큰: {sum(l['total_tokens'] for l in logs)}"
-    
-    # 토큰 사용량이 가장 많은 feature
-    feature_token = defaultdict(int)
-    for l in logs:
-        feature_token[l["feature"]] += l["total_tokens"]
-    top_token_feature = max(feature_token.items(), key=lambda x: x[1])[0] if feature_token else None
-    
-    # metrics: AdminMetric(BaseModel) 필드에 맞게 반환
+    # 24시간 내 로그만 필터링
+    now = datetime.now(timezone.utc)
+    logs_24h = [
+        l for l in logs
+        if "created_at" in l and
+           isinstance(l["created_at"], str) and
+           (now - parse_created_at(l["created_at"])).total_seconds() <= 86400
+    ]
+
+    # 기능별 집계
+    feature_stats = {}
+    for l in logs_24h:
+        f = l["feature"]
+        if f not in feature_stats:
+            feature_stats[f] = {
+                "count": 0,
+                "token_sum": 0,
+                "latency_sum": 0,
+                "owner": l.get("owner", ""),
+                "statuses": [],
+            }
+        feature_stats[f]["count"] += 1
+        feature_stats[f]["token_sum"] += l.get("total_tokens", 0)
+        feature_stats[f]["latency_sum"] += l.get("latency_ms", 0)
+        feature_stats[f]["statuses"].append((l.get("created_at", ""), l.get("status", "unknown")))
+
+    # summary 문자열 생성
+    summary_parts = [
+        f"{f} {v['count']}회(총 {v['token_sum']}토큰)"
+        for f, v in feature_stats.items()
+    ]
+    summary = "최근 24시간 동안 " + ", ".join(summary_parts)
+
+    # top_token_feature 계산
+    top_token_feature = None
+    top_token_amount = 0
+    for f, v in feature_stats.items():
+        if v["token_sum"] > top_token_amount:
+            top_token_feature = f
+            top_token_amount = v["token_sum"]
+
+    # metrics 생성
     metrics = []
-    for f in set(l["feature"] for l in logs):
-        f_logs = [l for l in logs if l["feature"] == f]
+    for f, v in feature_stats.items():
+        # 가장 최근 실행의 status
+        recent_status = sorted(v["statuses"], reverse=True)[0][1] if v["statuses"] else "unknown"
         metrics.append({
             "feature": f,
-            "owner": f_logs[0]["owner"] if f_logs else "",
-            "token_estimate": sum(l.get("total_tokens", 0) for l in f_logs),
-            "latency_ms": int(sum(l["latency_ms"] for l in f_logs) / len(f_logs)) if f_logs else 0,
-            "status": f_logs[0]["status"] if f_logs and "status" in f_logs[0] else "unknown",
+            "owner": v["owner"],
+            "token_estimate": v["token_sum"],
+            "latency_ms": int(v["latency_sum"] / v["count"]) if v["count"] else 0,
+            "status": recent_status,
         })
 
     # flow 데이터는 mock fallback
     data = load_mock("admin")
     return {
-        "owner": owner,
-        "feature": feature,
+        "owner": "나정연",
+        "feature": "admin",
         "summary": summary,
-        "top_token_feature": top_token_feature,
+        "top_token_feature": f"{top_token_feature} ({top_token_amount}토큰)" if top_token_feature else None,
         "metrics": metrics,
         "flow_nodes": data["flow_nodes"],
         "flow_edges": data["flow_edges"],
