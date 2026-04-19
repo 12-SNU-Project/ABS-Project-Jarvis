@@ -1,6 +1,6 @@
 extends Control
 
-@onready var chat_bubble = $UI/ChatBubble/MarginContainer/Text
+@onready var ui_layer = $UI
 @onready var ui_card = $UI/CardAnchor/UICard
 @onready var card_anchor = $UI/CardAnchor
 @onready var avatar = $Avatar
@@ -29,7 +29,7 @@ func _ready():
 	card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _fetch_mock_data(feature: String):
-	chat_bubble.text = "AI: " + feature + " 정보를 불러오는 중입니다..."
+	ui_layer.set_text("AI: " + feature + " 정보를 불러오는 중입니다...")
 	
 	var title = ""
 	var content = ""
@@ -48,7 +48,7 @@ func _fetch_mock_data(feature: String):
 			title = "Admin Dashboard"
 			content = "시스템 지표 상태:\n- CPU 사용량: 45%\n- 메모리 사용량: 60%\n- 모든 서비스 정상 작동 중."
 			
-	chat_bubble.text = "AI: " + feature + " 데이터를 요약해 드립니다."
+	ui_layer.set_text("AI: " + feature + " 데이터를 요약해 드립니다.")
 	
 	# Enable blocking clicks outside the card
 	card_anchor.mouse_filter = Control.MOUSE_FILTER_STOP
