@@ -12,7 +12,15 @@ export const briefingApi = {
     return response.data;
   },
   getSamsungHealth: async () => {
-    const response = await api.get('/health/sleep');
+    const response = await api.get('/api/v1/health/sleep');
+    return response.data;
+  },
+  pushSamsungHealthBridge: async (payload: Record<string, unknown>, bridgeToken: string) => {
+    const response = await api.post('/api/v1/health/sleep/bridge', payload, {
+      headers: {
+        'X-Bridge-Token': bridgeToken,
+      },
+    });
     return response.data;
   },
   getHealth: async () => {

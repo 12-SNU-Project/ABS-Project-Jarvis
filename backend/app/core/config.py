@@ -60,6 +60,8 @@ class Settings:
     samsung_health_use_mock: bool = True
     samsung_health_api_url: str = ""
     samsung_health_api_key: str = ""
+    samsung_health_bridge_token: str = ""
+    samsung_health_state_path: str = os.path.join(gettempdir(), "jarvis-samsung-health-state.json")
 
 
 def get_settings() -> Settings:
@@ -82,4 +84,9 @@ def get_settings() -> Settings:
         samsung_health_use_mock=_as_bool(os.getenv("SAMSUNG_HEALTH_USE_MOCK"), True),
         samsung_health_api_url=os.getenv("SAMSUNG_HEALTH_API_URL", ""),
         samsung_health_api_key=os.getenv("SAMSUNG_HEALTH_API_KEY", ""),
+        samsung_health_bridge_token=os.getenv("SAMSUNG_HEALTH_BRIDGE_TOKEN", ""),
+        samsung_health_state_path=os.getenv(
+            "SAMSUNG_HEALTH_STATE_PATH",
+            os.path.join(gettempdir(), "jarvis-samsung-health-state.json"),
+        ),
     )

@@ -1,9 +1,13 @@
 {
+  "health_data_type": "com.samsung.health.sleep",
   "detected_at": "2026-04-18T07:12:00+09:00",
-  "wake_time": "2026-04-18T07:05:00+09:00",
-  "sleep_start": "2026-04-17T23:48:00+09:00",
-  "sleep_end": "2026-04-18T07:05:00+09:00",
-  "sleep_duration_minutes": 437,
-  "status": "awake",
-  "summary": "오늘은 오전 7시 5분에 기상했고 총 수면 시간은 437분으로 감지되었습니다."
+  "items": [
+    {
+      "start_time": 1776440880000,
+      "end_time": 1776467100000,
+      "time_offset": 32400000,
+      "comment": "Samsung Health sleep session imported from Android bridge."
+    }
+  ],
+  "status": "awake"
 }

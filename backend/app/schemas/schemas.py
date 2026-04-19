@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -839,16 +839,122 @@ class PresentationDemo(FeatureResponse):
     cards: list[PresentationCard]
     closing_message: str
 
+
+class SamsungHealthDataTypePlan(BaseModel):
+    key: str = Field(description="Samsung Health data type key or product-facing alias.")
+    label: str = Field(description="Display label for the data type.")
+    priority: str = Field(description="Suggested implementation priority.", examples=["high"])
+    reason: str = Field(description="Why this data type is useful for the briefing experience.")
+
+
+class SamsungHealthBridgePayload(BaseModel):
+    model_config = ConfigDict(
+        extra="allow",
+        json_schema_extra={
+            "examples": [
+                {
+                    "health_data_type": "com.samsung.health.sleep",
+                    "detected_at": "2026-04-18T07:12:00+09:00",
+                    "status": "awake",
+                    "items": [
+                        {
+                            "start_time": 1776440880000,
+                            "end_time": 1776467100000,
+                            "time_offset": 32400000,
+                            "comment": "Samsung Health sleep session imported from Android bridge.",
+                        }
+                    ],
+                }
+            ]
+        },
+    )
+
+    health_data_type: str = Field(
+        default="com.samsung.health.sleep",
+        description="Samsung Health SDK data type identifier from the Android bridge.",
+    )
+    detected_at: str | None = Field(
+        default=None,
+        description="Bridge-side detection timestamp in ISO 8601 format.",
+    )
+    range_days: int = Field(
+        default=7,
+        ge=1,
+        le=30,
+        description="How many recent days of Samsung Health data the bridge attempted to upload.",
+    )
+    status: str | None = Field(
+        default=None,
+        description="Bridge-side derived status such as awake or sleeping.",
+    )
+    items: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description="Raw Samsung Health record list from the Android bridge.",
+    )
+
+
+class SamsungHealthSleepHistoryItem(BaseModel):
+    sleep_start: str
+    sleep_end: str
+    wake_time: str
+    sleep_duration_minutes: int
+    status: str
+
+
 class SamsungHealthSummary(BaseModel):
     source: str
     uses_mock: bool = True
+    integration_mode: str = Field(
+        description="How the backend expects Samsung Health data to arrive.",
+        examples=["android_sdk_bridge"],
+    )
+    partnership_required: bool = Field(
+        description="Whether production use requires Samsung Health partnership approval."
+    )
+    developer_mode_supported: bool = Field(
+        description="Whether Samsung Health developer mode can be used before partnership approval."
+    )
+    health_data_type: str = Field(
+        description="Primary Samsung Health data type used by this endpoint.",
+        examples=["com.samsung.health.sleep"],
+    )
+    planned_data_types: list[SamsungHealthDataTypePlan] = Field(
+        default_factory=list,
+        description="Recommended Samsung Health data types to expand next.",
+    )
+    range_days: int = Field(
+        default=7,
+        description="How many recent days of Samsung Health data were considered in this summary.",
+    )
+    recent_nights_count: int = Field(
+        default=0,
+        description="How many sleep sessions were included in the current summary window.",
+    )
     detected_at: str
     wake_time: Optional[str] = None
     sleep_start: Optional[str] = None
     sleep_end: Optional[str] = None
     sleep_duration_minutes: Optional[int] = None
+    average_sleep_duration_minutes: Optional[int] = None
+    average_wake_time: Optional[str] = None
+    sleep_debt_minutes_vs_target: Optional[int] = None
+    sleep_history: list[SamsungHealthSleepHistoryItem] = Field(
+        default_factory=list,
+        description="Recent sleep sessions normalized for assistant features.",
+    )
+    assistant_actions: list[str] = Field(
+        default_factory=list,
+        description="Concrete assistant-app actions or prompts that can be driven by this data.",
+    )
+    today_sleep_recommendation: Optional[str] = Field(
+        default=None,
+        description="A simple bedtime or recovery recommendation for today's briefing.",
+    )
     status: str
     summary: str
+    integration_notes: str = Field(
+        description="Implementation notes for SDK setup, partnership, and Android bridge assumptions."
+    )
 
 class BriefingRequest(BaseModel):
     user_input: str = Field(default="오늘 아침 브리핑 해줘")
