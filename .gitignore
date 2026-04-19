@@ -5,6 +5,7 @@ __pycache__
 node_modules
 dist
 .DS_Store
+.expo/
 
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm,python,visualstudiocode
