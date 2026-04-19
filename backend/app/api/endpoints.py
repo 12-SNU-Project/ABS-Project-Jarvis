@@ -107,6 +107,19 @@ PROPOSAL_NOT_FOUND_RESPONSE = _error_response(
         message="Proposal 'prop-abc123def456' not found.",
     ),
 )
+PROPOSAL_CREATE_NOT_FOUND_RESPONSE = _error_response(
+    "The referenced calendar or event does not exist.",
+    calendar_not_found=_error_example(
+        "Calendar not found",
+        code="calendar_not_found",
+        message="Calendar 'secondary' not found.",
+    ),
+    event_not_found=_error_example(
+        "Event not found",
+        code="event_not_found",
+        message="Event 'evt-missing' not found in calendar 'primary'.",
+    ),
+)
 PROPOSAL_CREATE_VALIDATION_RESPONSE = _error_response(
     "The proposal request payload was invalid.",
     validation_error=_error_example(
@@ -121,11 +134,31 @@ PROPOSAL_CREATE_VALIDATION_RESPONSE = _error_response(
         message="Field 'title' is required for this event operation.",
         field="event.title",
     ),
+    invalid_datetime=_error_example(
+        "Malformed datetime",
+        code="invalid_datetime",
+        message="Invalid datetime value '2026/04/18 09:00'.",
+        field="event.start",
+    ),
+    invalid_time_range=_error_example(
+        "Invalid time range",
+        code="invalid_time_range",
+        message="Event end must be after event start.",
+        field="event.end",
+    ),
     recurring_scope_required=_error_example(
         "Recurring scope missing",
         code="recurring_scope_required",
         message="Recurring event operations require an explicit scope.",
         field="recurring_scope",
+    ),
+)
+PROPOSAL_CREATE_CONFLICT_RESPONSE = _error_response(
+    "The proposal could not be created because of a state conflict.",
+    primary_calendar_protected=_error_example(
+        "Primary calendar protected",
+        code="primary_calendar_protected",
+        message="The primary calendar cannot be deleted in mock mode.",
     ),
 )
 PROPOSAL_EXECUTE_VALIDATION_RESPONSE = _error_response(
@@ -361,7 +394,11 @@ def get_calendar_summary_route(
     ),
     response_description="Created calendar operation proposal.",
     operation_id="create_calendar_operation_proposal",
-    responses={422: PROPOSAL_CREATE_VALIDATION_RESPONSE},
+    responses={
+        404: PROPOSAL_CREATE_NOT_FOUND_RESPONSE,
+        409: PROPOSAL_CREATE_CONFLICT_RESPONSE,
+        422: PROPOSAL_CREATE_VALIDATION_RESPONSE,
+    },
 )
 def create_calendar_operation_proposal_route(
     payload: CalendarOperationProposalRequest,

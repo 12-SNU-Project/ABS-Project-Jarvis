@@ -40,7 +40,7 @@ Calendar routes use the app-wide error envelope:
 }
 ```
 
-Important OpenAPI note: the generated schema for the shipped calendar routes already uses `ErrorResponse` for the documented `404`, `409`, and `422` branches and includes example payloads for the major failure cases. The remaining gap is that OpenAPI still cannot encode every operation-specific runtime invariant as JSON Schema.
+Important OpenAPI note: the generated schema for the shipped calendar routes uses `ErrorResponse` for the documented `404`, `409`, and `422` branches and includes example payloads for the major failure cases, including proposal-creation target misses and delete-primary conflicts. The remaining gap is that OpenAPI still cannot encode every operation-specific runtime invariant as JSON Schema.
 
 ## Read API
 
@@ -361,6 +361,17 @@ Warnings are preview-based and currently occur in these cases:
 - Every `delete_calendar` proposal: the same destructive warning
 - Any proposal whose previewed calendar state contains conflicts: `"Preview contains N timing conflict warning(s)."`
 - `delete_calendar` when that calendar contains events: `"Deleting this calendar also removes N event(s)."`
+
+#### Failure modes
+
+- `404 calendar_not_found`
+- `404 event_not_found`
+- `409 primary_calendar_protected`
+- `422 validation_error`
+- `422 invalid_event_payload`
+- `422 invalid_datetime`
+- `422 invalid_time_range`
+- `422 recurring_scope_required`
 
 ### `GET /api/v1/calendar-operations`
 

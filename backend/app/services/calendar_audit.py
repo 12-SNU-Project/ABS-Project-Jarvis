@@ -25,6 +25,17 @@ def proposal_view(proposal: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in proposal.items() if key != "request_payload"}
 
 
+def execution_result(proposal: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "proposal_id": proposal["proposal_id"],
+        "operation_type": proposal["operation_type"],
+        "status": proposal["status"],
+        "target_summary": proposal["target_summary"],
+        "snapshot_hash": proposal["snapshot_hash"],
+        "executed_at": proposal["executed_at"],
+    }
+
+
 def build_audit_record(
     proposal: dict[str, Any],
     *,
@@ -74,17 +85,20 @@ def execute_calendar_operation(proposal_id: str, snapshot_hash: str, confirmed: 
     state = load_calendar_state()
     proposal = get_proposal(state, proposal_id)
 
-    if proposal["status"] != "proposed":
-        raise AppError(
-            code="proposal_not_executable",
-            message=f"Proposal '{proposal_id}' is already in status '{proposal['status']}'.",
-            status_code=409,
-        )
-
     if proposal["snapshot_hash"] != snapshot_hash:
         raise AppError(
             code="snapshot_mismatch",
             message="The supplied snapshot hash does not match the proposal.",
+            status_code=409,
+        )
+
+    if proposal["status"] == "executed":
+        return execution_result(proposal)
+
+    if proposal["status"] != "proposed":
+        raise AppError(
+            code="proposal_not_executable",
+            message=f"Proposal '{proposal_id}' is already in status '{proposal['status']}'.",
             status_code=409,
         )
 
@@ -126,14 +140,7 @@ def execute_calendar_operation(proposal_id: str, snapshot_hash: str, confirmed: 
         ),
     )
     save_calendar_state(state)
-    return {
-        "proposal_id": proposal_id,
-        "operation_type": proposal["operation_type"],
-        "status": proposal["status"],
-        "target_summary": proposal["target_summary"],
-        "snapshot_hash": proposal["snapshot_hash"],
-        "executed_at": executed_at,
-    }
+    return execution_result(proposal)
 
 
 def get_calendar_audit_log() -> dict[str, Any]:

@@ -13,6 +13,7 @@ from app.providers.calendar_provider import (
     get_calendar,
     get_event,
     load_calendar_state,
+    move_event,
     save_calendar_state,
     store_proposal,
     update_event,
@@ -100,6 +101,20 @@ def target_summary(request_payload: dict[str, Any]) -> str:
     return f"Delete calendar '{calendar_id}'."
 
 
+def normalize_request_payload(request_payload: dict[str, Any]) -> dict[str, Any]:
+    normalized = dict(request_payload)
+    if (
+        normalized.get("operation_type") != "create_calendar"
+        and not normalized.get("calendar_id")
+    ):
+        normalized["calendar_id"] = "primary"
+    if normalized.get("event") is not None:
+        normalized["event"] = dict(normalized["event"])
+    if normalized.get("calendar") is not None:
+        normalized["calendar"] = dict(normalized["calendar"])
+    return normalized
+
+
 def preview_operation(
     state: dict[str, Any],
     request_payload: dict[str, Any],
@@ -121,7 +136,7 @@ def preview_operation(
         )
         return None, {"events": created_events}, preview_state
 
-    if operation_type in {"update_event", "move_event"}:
+    if operation_type == "update_event":
         before_event = get_event(preview_state, calendar_id, event_id)
         updated_events = update_event(
             preview_state,
@@ -131,6 +146,17 @@ def preview_operation(
             recurring_scope,
         )
         return {"events": [before_event]}, {"events": updated_events}, preview_state
+
+    if operation_type == "move_event":
+        before_event = get_event(preview_state, calendar_id, event_id)
+        moved_events = move_event(
+            preview_state,
+            calendar_id,
+            event_id,
+            validate_event_payload(event_payload),
+            recurring_scope,
+        )
+        return {"events": [before_event]}, {"events": moved_events}, preview_state
 
     if operation_type == "delete_event":
         before_event = get_event(preview_state, calendar_id, event_id)
@@ -168,7 +194,7 @@ def apply_operation(
         )
         return None, {"events": created_events}
 
-    if operation_type in {"update_event", "move_event"}:
+    if operation_type == "update_event":
         before_events = [get_event(state, calendar_id, event_id)]
         updated_events = update_event(
             state,
@@ -178,6 +204,17 @@ def apply_operation(
             recurring_scope,
         )
         return {"events": before_events}, {"events": updated_events}
+
+    if operation_type == "move_event":
+        before_events = [get_event(state, calendar_id, event_id)]
+        moved_events = move_event(
+            state,
+            calendar_id,
+            event_id,
+            validate_event_payload(event_payload),
+            recurring_scope,
+        )
+        return {"events": before_events}, {"events": moved_events}
 
     if operation_type == "delete_event":
         before_events = [get_event(state, calendar_id, event_id)]
@@ -195,24 +232,25 @@ def apply_operation(
 
 
 def create_calendar_operation_proposal(request_payload: dict[str, Any]) -> dict[str, Any]:
+    normalized_request_payload = normalize_request_payload(request_payload)
     state = load_calendar_state()
-    before_state, after_state, preview_state = preview_operation(state, request_payload)
+    before_state, after_state, preview_state = preview_operation(state, normalized_request_payload)
     proposal = {
         "proposal_id": f"prop-{uuid.uuid4().hex[:12]}",
-        "operation_type": request_payload["operation_type"],
+        "operation_type": normalized_request_payload["operation_type"],
         "status": "proposed",
-        "actor": request_payload.get("actor", "agent"),
-        "target_summary": target_summary(request_payload),
-        "calendar_id": request_payload.get("calendar_id"),
-        "event_id": request_payload.get("event_id"),
-        "recurring_scope": request_payload.get("recurring_scope"),
+        "actor": normalized_request_payload.get("actor", "agent"),
+        "target_summary": target_summary(normalized_request_payload),
+        "calendar_id": normalized_request_payload.get("calendar_id"),
+        "event_id": normalized_request_payload.get("event_id"),
+        "recurring_scope": normalized_request_payload.get("recurring_scope"),
         "requires_confirmation": True,
         "warnings": build_warnings(
-            request_payload["operation_type"],
+            normalized_request_payload["operation_type"],
             before_state,
             after_state,
             preview_state,
-            request_payload.get("calendar_id"),
+            normalized_request_payload.get("calendar_id"),
         ),
         "before_state": before_state,
         "after_state": after_state,
@@ -220,7 +258,7 @@ def create_calendar_operation_proposal(request_payload: dict[str, Any]) -> dict[
         "created_at": current_timestamp(),
         "executed_at": None,
         "error_message": None,
-        "request_payload": request_payload,
+        "request_payload": normalized_request_payload,
     }
     store_proposal(state, proposal)
     save_calendar_state(state)

@@ -282,6 +282,68 @@ def update_event(
     return updated_events
 
 
+def _resolve_move_bounds(
+    event: dict[str, Any],
+    payload: dict[str, Any],
+) -> tuple[datetime | None, datetime | None]:
+    new_start = _parse_datetime(payload["start"]) if payload.get("start") else None
+    new_end = _parse_datetime(payload["end"]) if payload.get("end") else None
+    if new_start is None and new_end is None:
+        return None, None
+
+    original_start = _parse_datetime(event["start"])
+    original_end = _parse_datetime(event["end"])
+    duration = original_end - original_start
+
+    if new_start is None:
+        new_start = new_end - duration
+    if new_end is None:
+        new_end = new_start + duration
+
+    return new_start, new_end
+
+
+def move_event(
+    state: dict[str, Any],
+    calendar_id: str,
+    event_id: str,
+    payload: dict[str, Any],
+    recurring_scope: str | None = None,
+) -> list[dict[str, Any]]:
+    indexes = _event_indexes_for_scope(state, calendar_id, event_id, recurring_scope)
+    target_event = get_event(state, calendar_id, event_id)
+    target_start = _parse_datetime(target_event["start"])
+    target_end = _parse_datetime(target_event["end"])
+    new_start, new_end = _resolve_move_bounds(target_event, payload)
+    start_delta = (new_start - target_start) if new_start is not None else None
+    end_delta = (new_end - target_end) if new_end is not None else None
+    shift_series = target_event["recurring"] and recurring_scope in {"following", "series"}
+
+    updated_events: list[dict[str, Any]] = []
+    for index in indexes:
+        current_event = state["events"][index]
+        current_start = _parse_datetime(current_event["start"])
+        current_end = _parse_datetime(current_event["end"])
+
+        for key, value in payload.items():
+            if key in {"start", "end"} or value is None:
+                continue
+            current_event[key] = value
+
+        if new_start is not None:
+            current_event["start"] = (
+                current_start + start_delta if shift_series else new_start
+            ).isoformat()
+        if new_end is not None:
+            current_event["end"] = (
+                current_end + end_delta if shift_series else new_end
+            ).isoformat()
+
+        updated_events.append(_normalize_event(current_event))
+
+    return updated_events
+
+
 def delete_event(
     state: dict[str, Any],
     calendar_id: str,

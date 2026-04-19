@@ -3,8 +3,9 @@ from __future__ import annotations
 import hashlib
 import json
 from copy import deepcopy
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from app.core.config import get_settings
 from app.core.errors import AppError
@@ -34,13 +35,14 @@ def parse_datetime(value: str) -> datetime:
 
 def parse_date(value: str) -> datetime:
     try:
-        return datetime.fromisoformat(f"{value}T00:00:00+09:00")
+        parsed_date = date.fromisoformat(value)
     except ValueError as exc:
         raise AppError(
             code="invalid_date",
             message=f"Invalid date value '{value}'.",
             status_code=422,
         ) from exc
+    return datetime.combine(parsed_date, time.min, tzinfo=ZoneInfo(get_settings().default_timezone))
 
 
 def current_timestamp() -> str:

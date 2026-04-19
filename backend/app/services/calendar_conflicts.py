@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from app.providers.calendar_provider import get_calendar, list_events, load_calendar_state
@@ -11,35 +12,82 @@ from app.services.calendar_read import (
 )
 
 
+def _sorted_calendar_events(events: list[dict[str, Any]]) -> list[tuple[Any, Any, dict[str, Any]]]:
+    sorted_events: list[tuple[Any, Any, dict[str, Any]]] = []
+    for event in events:
+        sorted_events.append((parse_datetime(event["start"]), parse_datetime(event["end"]), event))
+
+    sorted_events.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+            str(item[2].get("id", "")),
+            str(item[2].get("title", "")),
+        )
+    )
+    return sorted_events
+
+
+def _build_conflict(
+    left_event: dict[str, Any],
+    right_event: dict[str, Any],
+    *,
+    conflict_type: str,
+    gap_minutes: int | None = None,
+) -> dict[str, Any]:
+    if conflict_type == "overlap":
+        return {
+            "type": "overlap",
+            "message": f"'{left_event['title']}' overlaps with '{right_event['title']}'.",
+            "severity": "high",
+            "event_ids": [left_event["id"], right_event["id"]],
+        }
+
+    return {
+        "type": "tight_buffer",
+        "message": f"Only {gap_minutes} minutes separate '{left_event['title']}' and '{right_event['title']}'.",
+        "severity": "medium",
+        "event_ids": [left_event["id"], right_event["id"]],
+    }
+
+
+def _conflict_rank(conflict_type: str) -> int:
+    if conflict_type == "overlap":
+        return 2
+    if conflict_type == "tight_buffer":
+        return 1
+    return 0
+
+
 def detect_conflicts(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    conflicts: list[dict[str, Any]] = []
-    sorted_events = sorted(events, key=lambda event: event["start"])
-    for previous, current in zip(sorted_events, sorted_events[1:]):
-        previous_end = parse_datetime(previous["end"])
-        current_start = parse_datetime(current["start"])
-        if current_start < previous_end:
-            conflicts.append(
-                {
-                    "type": "overlap",
-                    "message": f"'{previous['title']}' overlaps with '{current['title']}'.",
-                    "severity": "high",
-                    "event_ids": [previous["id"], current["id"]],
-                }
-            )
-            continue
+    conflicts_by_pair: dict[tuple[str, str], dict[str, Any]] = {}
+    sorted_events = _sorted_calendar_events(events)
 
-        gap_minutes = int((current_start - previous_end).total_seconds() // 60)
-        if gap_minutes < CALENDAR_BUFFER_MINUTES:
-            conflicts.append(
-                {
-                    "type": "tight_buffer",
-                    "message": f"Only {gap_minutes} minutes separate '{previous['title']}' and '{current['title']}'.",
-                    "severity": "medium",
-                    "event_ids": [previous["id"], current["id"]],
-                }
-            )
+    for index, (_, event_end, event) in enumerate(sorted_events):
+        compare_until = event_end + timedelta(minutes=CALENDAR_BUFFER_MINUTES)
+        for next_start, _, next_event in sorted_events[index + 1 :]:
+            if next_start >= compare_until:
+                break
 
-    return conflicts
+            pair_key = (str(event["id"]), str(next_event["id"]))
+            gap_minutes = int((next_start - event_end).total_seconds() // 60)
+            if gap_minutes < 0:
+                conflict = _build_conflict(event, next_event, conflict_type="overlap")
+            elif gap_minutes < CALENDAR_BUFFER_MINUTES:
+                conflict = _build_conflict(
+                    event,
+                    next_event,
+                    conflict_type="tight_buffer",
+                    gap_minutes=gap_minutes,
+                )
+            else:
+                continue
+
+            existing = conflicts_by_pair.get(pair_key)
+            if existing is None or _conflict_rank(conflict["type"]) > _conflict_rank(existing["type"]):
+                conflicts_by_pair[pair_key] = conflict
+
+    return list(conflicts_by_pair.values())
 
 
 def build_summary(

@@ -99,9 +99,29 @@ def test_openapi_calendar_operation_contract_exposes_request_models_and_enums(cl
     assert proposal_post["responses"]["201"]["content"]["application/json"]["schema"]["$ref"] == (
         "#/components/schemas/CalendarOperationProposal"
     )
+    assert proposal_post["responses"]["404"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert set(proposal_post["responses"]["404"]["content"]["application/json"]["examples"]) == {
+        "calendar_not_found",
+        "event_not_found",
+    }
+    assert proposal_post["responses"]["409"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert set(proposal_post["responses"]["409"]["content"]["application/json"]["examples"]) == {
+        "primary_calendar_protected",
+    }
     assert proposal_post["responses"]["422"]["content"]["application/json"]["schema"]["$ref"] == (
         "#/components/schemas/ErrorResponse"
     )
+    assert set(proposal_post["responses"]["422"]["content"]["application/json"]["examples"]) == {
+        "validation_error",
+        "invalid_event_payload",
+        "invalid_datetime",
+        "invalid_time_range",
+        "recurring_scope_required",
+    }
 
     assert execute_post["tags"] == ["calendar-operations"]
     assert [parameter["name"] for parameter in execute_post["parameters"]] == ["proposal_id"]
