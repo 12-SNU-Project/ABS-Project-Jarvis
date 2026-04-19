@@ -8,6 +8,8 @@ from app.core.config import get_settings
 from app.core.errors import AppError, error_detail
 from app.schemas.schemas import (
     AdminSummary,
+    AgentInterpretRequest,
+    AgentInterpretResponse,
     BriefingRequest,
     CalendarAuditResponse,
     CalendarConflictsResponse,
@@ -18,6 +20,7 @@ from app.schemas.schemas import (
     CalendarOperationListResponse,
     CalendarOperationProposal,
     CalendarOperationProposalRequest,
+    CalendarOperationRejectRequest,
     CalendarOperationResult,
     CalendarSummaryResponse,
     ErrorResponse,
@@ -26,6 +29,7 @@ from app.schemas.schemas import (
     PresentationDemo,
 )
 from app.services.admin import get_admin_summary
+from app.services.agent_interpreter import interpret_agent_instruction
 from app.services.calendar import (
     create_calendar_operation_proposal,
     execute_calendar_operation,
@@ -37,6 +41,7 @@ from app.services.calendar import (
     get_calendar_summary_response,
     list_calendar_operation_proposals,
     list_calendars_response,
+    reject_calendar_operation,
 )
 from app.services.orchestrator import create_briefing
 from app.services.presentation import get_presentation_demo
@@ -176,6 +181,15 @@ PROPOSAL_EXECUTE_VALIDATION_RESPONSE = _error_response(
         field="confirmed",
     ),
 )
+PROPOSAL_REJECT_VALIDATION_RESPONSE = _error_response(
+    "The reject request payload was invalid.",
+    validation_error=_error_example(
+        "Request schema validation failure",
+        code="validation_error",
+        message="Request validation failed.",
+        field="proposal_id",
+    ),
+)
 PROPOSAL_CONFLICT_RESPONSE = _error_response(
     "The proposal could not be executed because of a state conflict.",
     proposal_mismatch=_error_example(
@@ -199,6 +213,24 @@ PROPOSAL_CONFLICT_RESPONSE = _error_response(
         "Proposal became stale",
         code="proposal_stale",
         message="Calendar state changed after this proposal was created.",
+    ),
+)
+AGENT_INTERPRET_ERROR_RESPONSE = _error_response(
+    "The natural-language instruction could not be interpreted.",
+    openai_not_configured=_error_example(
+        "OpenAI not configured",
+        code="openai_not_configured",
+        message="OPENAI_API_KEY is not configured for the backend agent interpreter.",
+    ),
+    openai_request_failed=_error_example(
+        "OpenAI request failed",
+        code="openai_request_failed",
+        message="The OpenAI API rejected the request.",
+    ),
+    openai_invalid_response=_error_example(
+        "OpenAI invalid response",
+        code="openai_invalid_response",
+        message="OpenAI returned invalid JSON for the command interpretation.",
     ),
 )
 
@@ -254,6 +286,25 @@ def create_briefing_route(payload: BriefingRequest) -> FinalBriefing:
         location=payload.location,
         date=payload.date,
         user_name=payload.user_name,
+    )
+
+
+@router.post(
+    "/agent/interpret",
+    response_model=AgentInterpretResponse,
+    tags=["agent"],
+    responses={
+        404: CALENDAR_NOT_FOUND_RESPONSE,
+        502: AGENT_INTERPRET_ERROR_RESPONSE,
+        503: AGENT_INTERPRET_ERROR_RESPONSE,
+    },
+)
+def interpret_agent_route(payload: AgentInterpretRequest) -> AgentInterpretResponse:
+    return interpret_agent_instruction(
+        user_input=payload.input,
+        date=payload.date,
+        calendar_id=payload.calendar_id,
+        latest_proposal_id=payload.latest_proposal_id,
     )
 
 
@@ -476,6 +527,47 @@ def execute_calendar_operation_route(
         proposal_id=proposal_id,
         snapshot_hash=payload.snapshot_hash,
         confirmed=payload.confirmed,
+    )
+
+
+@router.post(
+    "/calendar-operations/{proposal_id}/reject",
+    response_model=CalendarOperationResult,
+    tags=["calendar-operations"],
+    summary="Reject calendar operation proposal",
+    description=(
+        "Marks a previously proposed calendar operation as rejected without applying it. "
+        "The body proposal_id must match the path proposal_id."
+    ),
+    response_description="Rejection result for the calendar operation proposal.",
+    operation_id="reject_calendar_operation_proposal",
+    responses={
+        404: PROPOSAL_NOT_FOUND_RESPONSE,
+        409: PROPOSAL_CONFLICT_RESPONSE,
+        422: PROPOSAL_REJECT_VALIDATION_RESPONSE,
+    },
+)
+def reject_calendar_operation_route(
+    proposal_id: ProposalId,
+    payload: CalendarOperationRejectRequest,
+) -> CalendarOperationResult:
+    if payload.proposal_id != proposal_id:
+        raise AppError(
+            code="proposal_mismatch",
+            message="The proposal_id in the body must match the path parameter.",
+            status_code=409,
+            details=[
+                error_detail(
+                    code="proposal_mismatch",
+                    message="The proposal_id in the body must match the path parameter.",
+                    field="proposal_id",
+                )
+            ],
+        )
+
+    return reject_calendar_operation(
+        proposal_id=proposal_id,
+        reason=payload.reason,
     )
 
 

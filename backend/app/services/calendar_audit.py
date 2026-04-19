@@ -150,6 +150,44 @@ def execute_calendar_operation(proposal_id: str, snapshot_hash: str, confirmed: 
     return execution_result(proposal)
 
 
+def reject_calendar_operation(
+    proposal_id: str,
+    *,
+    reason: str | None = None,
+) -> dict[str, Any]:
+    state = load_calendar_state()
+    proposal = get_proposal(state, proposal_id)
+
+    if proposal["status"] == "rejected":
+        return execution_result(proposal)
+
+    if proposal["status"] != "proposed":
+        raise AppError(
+            code="proposal_not_executable",
+            message=f"Proposal '{proposal_id}' is already in status '{proposal['status']}'.",
+            status_code=409,
+        )
+
+    rejected_at = current_timestamp()
+    proposal["status"] = "rejected"
+    proposal["executed_at"] = rejected_at
+    proposal["error_message"] = reason or "Proposal rejected by user."
+    replace_proposal(state, proposal_id, proposal)
+    append_audit_record(
+        state,
+        build_audit_record(
+            proposal,
+            before_state=proposal.get("before_state"),
+            after_state=None,
+            result_status="rejected",
+            error_message=proposal["error_message"],
+            recorded_at=rejected_at,
+        ),
+    )
+    save_calendar_state(state)
+    return execution_result(proposal)
+
+
 def get_calendar_audit_log() -> dict[str, Any]:
     state = load_calendar_state()
     return {**base_calendar_payload(), "records": list_audit_records(state)}

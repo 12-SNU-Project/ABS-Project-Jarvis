@@ -25,6 +25,7 @@ def test_openapi_lists_calendar_paths_and_base_metadata(client) -> None:
         "/api/v1/calendar-operations",
         "/api/v1/calendar-operations/{proposal_id}",
         "/api/v1/calendar-operations/{proposal_id}/execute",
+        "/api/v1/calendar-operations/{proposal_id}/reject",
         "/api/v1/calendar-operation-audit",
     }
 
@@ -91,6 +92,7 @@ def test_openapi_calendar_operation_contract_exposes_request_models_and_enums(cl
 
     proposal_post = paths["/api/v1/calendar-operations/proposals"]["post"]
     execute_post = paths["/api/v1/calendar-operations/{proposal_id}/execute"]["post"]
+    reject_post = paths["/api/v1/calendar-operations/{proposal_id}/reject"]["post"]
 
     assert proposal_post["tags"] == ["calendar-operations"]
     assert proposal_post["requestBody"]["content"]["application/json"]["schema"]["$ref"] == (
@@ -140,6 +142,23 @@ def test_openapi_calendar_operation_contract_exposes_request_models_and_enums(cl
     assert execute_post["responses"]["422"]["content"]["application/json"]["schema"]["$ref"] == (
         "#/components/schemas/ErrorResponse"
     )
+    assert reject_post["tags"] == ["calendar-operations"]
+    assert [parameter["name"] for parameter in reject_post["parameters"]] == ["proposal_id"]
+    assert reject_post["requestBody"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/CalendarOperationRejectRequest"
+    )
+    assert reject_post["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/CalendarOperationResult"
+    )
+    assert reject_post["responses"]["404"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert reject_post["responses"]["409"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert reject_post["responses"]["422"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
 
     proposal_request = components["CalendarOperationProposalRequest"]
     assert proposal_request["required"] == ["operation_type"]
@@ -151,6 +170,8 @@ def test_openapi_calendar_operation_contract_exposes_request_models_and_enums(cl
     execute_request = components["CalendarOperationExecuteRequest"]
     assert set(execute_request["required"]) == {"proposal_id", "snapshot_hash"}
     assert execute_request["properties"]["confirmed"]["default"] is True
+    reject_request = components["CalendarOperationRejectRequest"]
+    assert reject_request["required"] == ["proposal_id"]
 
     assert components["CalendarOperationType"]["enum"] == [
         "create_event",
@@ -177,3 +198,25 @@ def test_openapi_calendar_operation_contract_exposes_request_models_and_enums(cl
     assert components["CalendarEventMutation"]["properties"]["recurring"]["default"] is False
     assert components["CalendarMutation"]["required"] == ["name"]
     assert components["CalendarMutation"]["properties"]["timezone"]["default"] == "Asia/Seoul"
+
+
+def test_openapi_agent_interpret_contract_is_documented(client) -> None:
+    schema = _openapi_schema(client)
+    operation = schema["paths"]["/api/v1/agent/interpret"]["post"]
+
+    assert operation["tags"] == ["agent"]
+    assert operation["requestBody"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/AgentInterpretRequest"
+    )
+    assert operation["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/AgentInterpretResponse"
+    )
+    assert operation["responses"]["404"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert operation["responses"]["502"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert operation["responses"]["503"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )

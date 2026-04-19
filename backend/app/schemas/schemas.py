@@ -610,6 +610,28 @@ class CalendarOperationExecuteRequest(BaseModel):
     )
 
 
+class CalendarOperationRejectRequest(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "proposal_id": "prop-abc123def456",
+                    "reason": "User rejected the suggested change.",
+                }
+            ]
+        },
+    )
+
+    proposal_id: str = Field(
+        description="Proposal identifier that must match the path parameter."
+    )
+    reason: str | None = Field(
+        default=None,
+        description="Optional rejection reason recorded in the proposal and audit log.",
+    )
+
+
 class CalendarOperationResult(BaseModel):
     proposal_id: str = Field(description="Executed proposal identifier.")
     operation_type: CalendarOperationType = Field(
@@ -672,6 +694,68 @@ class CalendarAuditRecord(BaseModel):
 class CalendarAuditResponse(FeatureResponse):
     records: list[CalendarAuditRecord] = Field(
         description="Calendar operation audit records."
+    )
+
+
+class AgentInterpretStatus(StrEnum):
+    INTERPRETED = "interpreted"
+    CLARIFY = "clarify"
+
+
+class AgentInterpretRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    input: str = Field(
+        min_length=1,
+        description="Natural-language calendar instruction from the UI.",
+        examples=["Change the 기획리뷰. Defer it 30 minutes."],
+    )
+    date: str = Field(
+        description="Date context used to resolve relative scheduling requests.",
+        examples=["2026-04-18"],
+    )
+    calendar_id: str = Field(
+        default="primary",
+        description="Calendar context used to resolve event references.",
+        examples=["primary"],
+    )
+    latest_proposal_id: str | None = Field(
+        default=None,
+        description="Most recent proposal identifier available in the UI, when present.",
+        examples=["prop-abc123def456"],
+    )
+
+
+class AgentInterpretResponse(FeatureResponse):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "owner": "agent",
+                    "feature": "agent_interpreter",
+                    "uses_mock": True,
+                    "status": "interpreted",
+                    "source": "openai",
+                    "command": "move event evt-3 to 2026-04-18 from 15:30 to 16:30 calendar primary",
+                    "explanation": "Matched '기획리뷰' to evt-3 and shifted the meeting by 30 minutes.",
+                }
+            ]
+        }
+    )
+
+    status: AgentInterpretStatus = Field(
+        description="Whether the instruction was interpreted or needs clarification."
+    )
+    source: str = Field(
+        description="Interpreter source used to resolve the instruction.",
+        examples=["openai"],
+    )
+    command: str | None = Field(
+        default=None,
+        description="Normalized command string that matches the frontend command grammar.",
+    )
+    explanation: str = Field(
+        description="Human-readable explanation of the resolution or clarification request."
     )
 
 

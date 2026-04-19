@@ -5,6 +5,7 @@ from app.services.calendar_audit import (
     get_calendar_audit_log,
     get_calendar_operation_proposal,
     list_calendar_operation_proposals,
+    reject_calendar_operation,
 )
 from app.services.calendar_conflicts import (
     get_calendar_conflicts_response,
@@ -31,4 +32,5 @@ __all__ = [
     "get_calendar_summary_response",
     "list_calendar_operation_proposals",
     "list_calendars_response",
+    "reject_calendar_operation",
 ]

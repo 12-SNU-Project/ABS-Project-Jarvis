@@ -35,6 +35,16 @@ def _execute_operation(client, proposal: dict, *, snapshot_hash: str | None = No
     )
 
 
+def _reject_operation(client, proposal: dict, *, reason: str | None = None):
+    payload = {"proposal_id": proposal["proposal_id"]}
+    if reason is not None:
+        payload["reason"] = reason
+    return client.post(
+        f"/api/v1/calendar-operations/{proposal['proposal_id']}/reject",
+        json=payload,
+    )
+
+
 def test_single_event_move_preserves_duration(client) -> None:
     before_state = _load_state()
     original_event = _event_by_id(before_state, "evt-1")
@@ -281,6 +291,83 @@ def test_execute_retry_after_success_returns_success_without_duplicate_audit_ent
     assert second_response.json() == first_result
     assert len(_load_state()["audit_records"]) == len(state_after_first["audit_records"])
     assert _load_state() == state_after_first
+
+
+def test_reject_marks_proposal_rejected_without_mutating_calendar_state(client) -> None:
+    before_state = _load_state()
+    before_event = deepcopy(_event_by_id(before_state, "evt-1"))
+    proposal = _propose_operation(
+        client,
+        {
+            "operation_type": "move_event",
+            "calendar_id": "primary",
+            "event_id": "evt-1",
+            "actor": "agent",
+            "event": {
+                "start": (datetime.fromisoformat(before_event["start"]) + timedelta(minutes=30)).isoformat(),
+            },
+        },
+    )
+
+    response = _reject_operation(client, proposal, reason="User declined the reschedule.")
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "rejected"
+
+    state = _load_state()
+    assert _event_by_id(state, "evt-1") == before_event
+    rejected_proposal = next(
+        item for item in state["proposals"] if item["proposal_id"] == proposal["proposal_id"]
+    )
+    assert rejected_proposal["status"] == "rejected"
+    assert rejected_proposal["error_message"] == "User declined the reschedule."
+
+    audit_record = _audit_record_by_proposal_id(state, proposal["proposal_id"])
+    assert audit_record["result_status"] == "rejected"
+    assert audit_record["error_message"] == "User declined the reschedule."
+
+
+def test_reject_retry_after_success_returns_success_without_duplicate_audit_entries(client) -> None:
+    proposal = _propose_operation(
+        client,
+        {
+            "operation_type": "delete_event",
+            "calendar_id": "primary",
+            "event_id": "evt-1",
+            "actor": "agent",
+        },
+    )
+
+    first_response = _reject_operation(client, proposal)
+    state_after_first = deepcopy(_load_state())
+    first_result = first_response.json()
+
+    second_response = _reject_operation(client, proposal)
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+    assert second_response.json() == first_result
+    assert len(_load_state()["audit_records"]) == len(state_after_first["audit_records"])
+    assert _load_state() == state_after_first
+
+
+def test_rejecting_executed_proposal_returns_conflict(client) -> None:
+    proposal = _propose_operation(
+        client,
+        {
+            "operation_type": "delete_event",
+            "calendar_id": "primary",
+            "event_id": "evt-1",
+            "actor": "agent",
+        },
+    )
+
+    execute_response = _execute_operation(client, proposal)
+    reject_response = _reject_operation(client, proposal)
+
+    assert execute_response.status_code == 200
+    assert reject_response.status_code == 409
+    assert reject_response.json()["error"]["code"] == "proposal_not_executable"
 
 
 def test_omitted_calendar_id_is_persisted_as_primary_in_proposal_response_and_storage(client) -> None:
