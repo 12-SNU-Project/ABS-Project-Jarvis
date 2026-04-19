@@ -20,20 +20,23 @@ def get_admin_summary() -> dict:
     #   - 응답 시간
     #   - 토큰 사용량 또는 추정치
     #   - 에이전트 흐름 노드/엣지
-    # DB 초기화(앱 시작 시 1회만 호출해도 됨) -> FastAPI startup 이벤트에서 호출하도록 변경 가능
-    init_db()
+    # DB 초기화는 FastAPI startup 이벤트에서 1회만 호출하도록 변경됨
 
     logs = get_recent_feature_runs(limit=100)
     if not logs:
         print("No logs found, falling back to mock data for admin summary.")  # 디버깅용 출력
         # fallback to mock
         data = load_mock("admin")
+        # metrics가 dict면 list로 변환, 아니면 그대로 사용
+        metrics = data["metrics"]
+        if isinstance(metrics, dict):
+            metrics = list(metrics.values())
         return {
             "owner": "나정연",
             "feature": "admin",
             "summary": data["summary"],
             "top_token_feature": data["top_token_feature"],
-            "metrics": data["metrics"],
+            "metrics": metrics,
             "flow_nodes": data["flow_nodes"],
             "flow_edges": data["flow_edges"],
             "uses_mock": True,
@@ -50,15 +53,17 @@ def get_admin_summary() -> dict:
         feature_token[l["feature"]] += l["total_tokens"]
     top_token_feature = max(feature_token.items(), key=lambda x: x[1])[0] if feature_token else None
     
-    # metrics: feature별 토큰 합계, 평균 latency 등
-    metrics = {}
+    # metrics: AdminMetric(BaseModel) 필드에 맞게 반환
+    metrics = []
     for f in set(l["feature"] for l in logs):
         f_logs = [l for l in logs if l["feature"] == f]
-        metrics[f] = {
-            "count": len(f_logs),
-            "total_tokens": sum(l["total_tokens"] for l in f_logs),
-            "avg_latency_ms": int(sum(l["latency_ms"] for l in f_logs) / len(f_logs)),
-        }
+        metrics.append({
+            "feature": f,
+            "owner": f_logs[0]["owner"] if f_logs else "",
+            "token_estimate": sum(l.get("total_tokens", 0) for l in f_logs),
+            "latency_ms": int(sum(l["latency_ms"] for l in f_logs) / len(f_logs)) if f_logs else 0,
+            "status": f_logs[0]["status"] if f_logs and "status" in f_logs[0] else "unknown",
+        })
 
     # flow 데이터는 mock fallback
     data = load_mock("admin")
