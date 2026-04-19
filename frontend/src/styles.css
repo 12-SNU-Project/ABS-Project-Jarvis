@@ -244,11 +244,11 @@ button {
 .chat-log {
   min-height: 0;
   overflow: auto;
-  display: grid;
-  align-content: end;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   padding-right: 6px;
-  scroll-behavior: smooth;
+  overscroll-behavior: contain;
 }
 
 .chat-log::-webkit-scrollbar {
@@ -435,6 +435,8 @@ button {
 
 .assistant-sphere--speaking .assistant-sphere-svg {
   animation: sphereSpeaking 4.2s ease-in-out infinite;
+  filter: drop-shadow(0 0 18px rgba(255, 168, 96, 0.2))
+    drop-shadow(0 0 42px rgba(255, 124, 72, 0.12));
 }
 
 .assistant-sphere--listening .assistant-sphere-svg {
@@ -468,9 +470,10 @@ button {
 }
 
 .phase-pill--speaking {
-  color: var(--amber);
-  background: var(--amber-soft);
-  border-color: rgba(255, 174, 102, 0.34);
+  color: #ffd0a2;
+  background: linear-gradient(135deg, rgba(255, 174, 102, 0.2), rgba(255, 118, 82, 0.12));
+  border-color: rgba(255, 160, 92, 0.44);
+  box-shadow: 0 0 28px rgba(255, 150, 84, 0.12);
 }
 
 .phase-pill--listening {
@@ -518,16 +521,16 @@ button {
 @keyframes sphereSpeaking {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(0.985);
+    transform: translate3d(0, 0, 0) scale(0.988);
   }
-  25% {
-    transform: translate3d(0.8%, -0.7%, 0) scale(1.03);
+  18% {
+    transform: translate3d(0.3%, -0.6%, 0) scale(1.026);
   }
-  55% {
-    transform: translate3d(-0.6%, 0.4%, 0) scale(0.998);
+  42% {
+    transform: translate3d(-0.2%, 0.25%, 0) scale(0.998);
   }
-  78% {
-    transform: translate3d(0.4%, -0.2%, 0) scale(1.02);
+  67% {
+    transform: translate3d(0.2%, -0.35%, 0) scale(1.018);
   }
 }
 

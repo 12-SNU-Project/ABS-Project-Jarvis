@@ -25,11 +25,13 @@ type RenderPointState = {
   radius: number;
   opacity: number;
   depth: number;
+  energy: number;
 };
 type Palette = {
   core: RGB;
   accent: RGB;
   ambient: RGB;
+  halo: RGB;
 };
 type SphereComplexity = {
   pointCount: number;
@@ -132,8 +134,9 @@ function colorsForPhase(phase: AssistantPhase): Palette {
   if (phase === "speaking") {
     return {
       core: [255, 182, 106] as const,
-      accent: [255, 157, 68] as const,
-      ambient: [255, 181, 109] as const,
+      accent: [255, 110, 72] as const,
+      ambient: [255, 206, 140] as const,
+      halo: [255, 136, 84] as const,
     };
   }
 
@@ -142,6 +145,7 @@ function colorsForPhase(phase: AssistantPhase): Palette {
       core: [120, 255, 211] as const,
       accent: [46, 247, 197] as const,
       ambient: [89, 255, 216] as const,
+      halo: [64, 255, 214] as const,
     };
   }
 
@@ -149,6 +153,7 @@ function colorsForPhase(phase: AssistantPhase): Palette {
     core: [124, 232, 255] as const,
     accent: [73, 215, 255] as const,
     ambient: [103, 216, 255] as const,
+    halo: [80, 198, 255] as const,
   };
 }
 
@@ -162,6 +167,7 @@ function resolvePointTarget(
   let angleZ = 0;
   let radialBreathe = 1;
   let yOffset = 0;
+  let xOffset = 0;
   let energy = 0;
 
   if (phase === "thinking") {
@@ -172,15 +178,17 @@ function resolvePointTarget(
     radialBreathe = 1 + energy * 0.06;
     yOffset = -energy * 12;
   } else if (phase === "speaking") {
-    angleX = Math.sin(time * 1.2) * 0.25;
-    angleY = time * 0.95;
-    angleZ = Math.cos(time * 0.75) * 0.22;
-    const turbulence =
-      Math.sin(time * 5 + point.wave * 9) * 0.5 +
-      Math.cos(time * 3.4 + point.z * 6) * 0.5;
+    angleX = Math.sin(time * 0.9) * 0.16;
+    angleY = time * 1.08;
+    angleZ = Math.cos(time * 0.52) * 0.1;
+    const azimuth = Math.atan2(point.z, point.x);
+    const vocalRibbon = Math.sin(time * 7.8 + azimuth * 4.4 + point.wave * 12.6);
+    const shimmer = Math.cos(time * 3.2 - point.y * 10.5 + azimuth * 1.8);
+    const turbulence = vocalRibbon * 0.72 + shimmer * 0.28;
     energy = (turbulence + 1) / 2;
-    radialBreathe = 1 + energy * 0.18;
-    yOffset = Math.sin(time * 4.2 + point.wave * 8) * 10;
+    radialBreathe = 1 + energy * 0.2 + Math.max(0, vocalRibbon) * 0.06;
+    yOffset = Math.sin(time * 6.4 + point.wave * 10 + azimuth) * 9;
+    xOffset = Math.cos(time * 4.8 + azimuth * 2.2) * Math.max(0, vocalRibbon) * 8;
   } else if (phase === "listening") {
     angleX = -0.1 + Math.sin(time * 0.42) * 0.03;
     angleY = time * 0.34;
@@ -198,7 +206,7 @@ function resolvePointTarget(
   }
 
   const rotated = rotatePoint(point, angleX, angleY, angleZ);
-  const scaledX = rotated.x * BASE_RADIUS * radialBreathe;
+  const scaledX = rotated.x * BASE_RADIUS * radialBreathe + xOffset;
   const scaledY = rotated.y * BASE_RADIUS * radialBreathe + yOffset;
   const scaledZ = rotated.z * BASE_RADIUS;
   const perspective = CAMERA_DISTANCE / (CAMERA_DISTANCE - scaledZ);
@@ -212,6 +220,7 @@ function resolvePointTarget(
       ((rotated.z + 1) / 2) * 0.54 +
       (phase === "speaking" ? energy * 0.12 : energy * 0.09),
     depth: rotated.z,
+    energy,
   };
 }
 
@@ -332,20 +341,29 @@ function AssistantSphereInner({ phase }: { phase: AssistantPhase }) {
       palette.core = mixRgb(palette.core, targetPalette.core, 0.1);
       palette.accent = mixRgb(palette.accent, targetPalette.accent, 0.1);
       palette.ambient = mixRgb(palette.ambient, targetPalette.ambient, 0.1);
+      palette.halo = mixRgb(palette.halo, targetPalette.halo, 0.1);
       context.clearRect(0, 0, VIEWBOX_SIZE, VIEWBOX_SIZE);
 
       drawGlow(
         BASE_RADIUS * 1.55,
-        rgba(palette.core, 0.18),
+        rgba(activePhase === "speaking" ? palette.halo : palette.core, 0.22),
         rgba(palette.core, 0.02),
         1,
       );
       drawGlow(
         BASE_RADIUS * 0.92,
         rgba(palette.core, 0.5),
-        rgba(palette.accent, 0.14),
+        rgba(activePhase === "speaking" ? palette.halo : palette.accent, 0.16),
         1,
       );
+      if (activePhase === "speaking") {
+        drawGlow(
+          BASE_RADIUS * 1.12,
+          rgba(palette.accent, 0.2),
+          rgba(palette.halo, 0.04),
+          0.9,
+        );
+      }
 
       for (const particle of ambientParticles) {
         context.globalAlpha = particle.opacity;
@@ -365,6 +383,7 @@ function AssistantSphereInner({ phase }: { phase: AssistantPhase }) {
           current.radius = lerp(current.radius, target.radius, 0.18);
           current.opacity = lerp(current.opacity, target.opacity, 0.18);
           current.depth = lerp(current.depth, target.depth, 0.14);
+          current.energy = lerp(current.energy, target.energy, 0.16);
 
           return current;
         })
@@ -372,7 +391,10 @@ function AssistantSphereInner({ phase }: { phase: AssistantPhase }) {
 
       for (const point of renderedPoints) {
         context.globalAlpha = Math.min(point.opacity * 0.24, 0.18);
-        context.fillStyle = rgba(palette.core, 1);
+        context.fillStyle = rgba(
+          mixRgb(palette.core, palette.halo, point.energy * 0.7),
+          1,
+        );
         context.beginPath();
         context.arc(point.x, point.y, point.radius * 1.4, 0, Math.PI * 2);
         context.fill();
@@ -380,7 +402,10 @@ function AssistantSphereInner({ phase }: { phase: AssistantPhase }) {
 
       for (const point of renderedPoints) {
         context.globalAlpha = Math.min(point.opacity, 0.9);
-        context.fillStyle = rgba(palette.core, 1);
+        context.fillStyle = rgba(
+          mixRgb(palette.core, palette.accent, point.energy * 0.85),
+          1,
+        );
         context.beginPath();
         context.arc(point.x, point.y, point.radius, 0, Math.PI * 2);
         context.fill();

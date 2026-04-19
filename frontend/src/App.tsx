@@ -10,7 +10,17 @@ import {
 } from "react";
 
 import { AssistantSphere } from "./components/AssistantSphere";
-import { HELP_TEXT, parseCommand, type AgentAction } from "./lib/agent";
+import {
+  HELP_TEXT,
+  buildCreateProposalFromDraft,
+  buildEventDraftPrompt,
+  continuePendingEventDraft,
+  inferPendingEventDraft,
+  isEventDraftComplete,
+  parseCommand,
+  type AgentAction,
+  type PendingEventDraft,
+} from "./lib/agent";
 import { ApiError, createApi } from "./lib/api";
 import { API_BASE_URL } from "./lib/config";
 import { startupGreetingApi } from "./lib/startupGreetingApi";
@@ -29,6 +39,15 @@ type ChatMessage = {
   id: string;
   role: "assistant" | "user";
   text: string;
+};
+
+type ContextualReadAction = Extract<
+  AgentAction,
+  { kind: "showEvents" | "showConflicts" | "showSummary" | "showBriefing" }
+>;
+
+type PendingConfirmation = {
+  action: AgentAction;
 };
 
 type SpeechRecognitionCtor = new () => {
@@ -77,6 +96,13 @@ function getLocalDate(): string {
   }).format(new Date());
 }
 
+function shiftIsoDate(date: string, days: number): string {
+  const [year, month, day] = date.split("-").map(Number);
+  const shifted = new Date(Date.UTC(year, month - 1, day));
+  shifted.setUTCDate(shifted.getUTCDate() + days);
+  return shifted.toISOString().slice(0, 10);
+}
+
 function clock(isoValue: string): string {
   return isoValue.slice(11, 16);
 }
@@ -88,8 +114,8 @@ function formatEventLine(event: CalendarEvent): string {
     segments.push(`at ${event.location}`);
   }
 
-  if (event.priority) {
-    segments.push(`[${event.priority}]`);
+  if (event.priority && event.priority !== "medium") {
+    segments.push(`(${event.priority} priority)`);
   }
 
   return `- ${segments.join(" ")}`;
@@ -110,6 +136,172 @@ function formatProposalLine(proposal: CalendarOperationProposal): string {
 
 function formatAuditLine(record: CalendarAuditRecord): string {
   return `- ${record.result_status.toUpperCase()} ${record.operation_type} on ${record.recorded_at}: ${record.event_id ?? record.calendar_id ?? record.proposal_id}`;
+}
+
+function formatReadableDate(date: string, defaultDate: string): string {
+  if (date === defaultDate) {
+    return "today";
+  }
+  return date;
+}
+
+function formatProposalWarningText(warnings: string[]): string {
+  const parts: string[] = [];
+
+  if (
+    warnings.some((warning) =>
+      /destructive and requires explicit confirmation/i.test(warning),
+    )
+  ) {
+    parts.push(
+      "Because this removes existing calendar data, I am holding it for confirmation.",
+    );
+  }
+
+  if (warnings.some((warning) => /timing conflict warning/i.test(warning))) {
+    parts.push(
+      "This change may conflict with something already on your calendar.",
+    );
+  }
+
+  return parts.join(" ");
+}
+
+function formatDraftedProposalResponse(
+  action: Extract<
+    AgentAction,
+    { kind: "createProposal" | "createCalendar" | "deleteCalendar" }
+  >,
+  proposal: CalendarOperationProposal,
+  defaultDate: string,
+): string {
+  if (
+    action.kind === "createProposal" &&
+    action.payload.operation_type === "create_event"
+  ) {
+    const event = action.payload.event as
+      | {
+          title?: string;
+          start?: string;
+          end?: string;
+          location?: string;
+        }
+      | undefined;
+    const calendarId =
+      (action.payload.calendar_id as string | undefined) ??
+      proposal.calendar_id ??
+      "primary";
+    const title = event?.title ?? "Meeting";
+    const start = event?.start;
+    const end = event?.end;
+    const date = start?.slice(0, 10) ?? defaultDate;
+    const dateLabel = formatReadableDate(date, defaultDate);
+    const timeLabel =
+      start && end ? `${clock(start)} to ${clock(end)}` : "the requested time";
+    const locationLabel = event?.location ? ` via ${event.location}` : "";
+    const warningLine =
+      proposal.warnings.length > 0
+        ? `\nWarnings: ${proposal.warnings.join("; ")}`
+        : "";
+
+    return `All right. I've drafted "${title}" for ${dateLabel} from ${timeLabel}${locationLabel} on your ${calendarId} calendar. Say "execute latest" when you want me to place it.${warningLine}`;
+  }
+
+  if (action.kind === "createCalendar") {
+    const name = action.payload.calendar.name;
+    return `All right. I've drafted a new calendar named "${name}". Say "execute latest" when you want me to create it.`;
+  }
+
+  if (action.kind === "deleteCalendar") {
+    const warningText = formatProposalWarningText(proposal.warnings);
+    return `All right. I've prepared the deletion of calendar "${action.payload.calendar_id}". ${warningText} Say "execute latest" when you want me to apply it.`;
+  }
+
+  if (
+    action.kind === "createProposal" &&
+    action.payload.operation_type === "delete_event"
+  ) {
+    const beforeState = proposal.before_state as
+      | { events?: CalendarEvent[] }
+      | null
+      | undefined;
+    const event = beforeState?.events?.[0];
+    const eventName = event?.title ?? "that event";
+    const warningText = formatProposalWarningText(proposal.warnings);
+    return `Understood. I've prepared the cancellation of "${eventName}" from your ${proposal.calendar_id ?? "primary"} calendar. ${warningText} Say "execute latest" when you want me to remove it.`;
+  }
+
+  return formatProposalLine(proposal);
+}
+
+function extractEventFromProposalState(
+  proposal: CalendarOperationProposal,
+): CalendarEvent | null {
+  const afterState = proposal.after_state as
+    | { events?: CalendarEvent[] }
+    | null
+    | undefined;
+  return afterState?.events?.[0] ?? null;
+}
+
+function extractBeforeEventFromProposalState(
+  proposal: CalendarOperationProposal,
+): CalendarEvent | null {
+  const beforeState = proposal.before_state as
+    | { events?: CalendarEvent[] }
+    | null
+    | undefined;
+  return beforeState?.events?.[0] ?? null;
+}
+
+function formatExecutedProposalResponse(
+  proposal: CalendarOperationProposal,
+  defaultDate: string,
+): string {
+  if (proposal.operation_type === "create_event") {
+    const event = extractEventFromProposalState(proposal);
+    if (event) {
+      const dateLabel = formatReadableDate(event.start.slice(0, 10), defaultDate);
+      const locationLabel = event.location ? ` via ${event.location}` : "";
+      return `Done. "${event.title}" has been added to your calendar for ${dateLabel} from ${clock(event.start)} to ${clock(event.end)}${locationLabel}.`;
+    }
+    return "Done. The event has been added to your calendar.";
+  }
+
+  if (proposal.operation_type === "create_calendar") {
+    return "Done. The new calendar has been created.";
+  }
+
+  if (proposal.operation_type === "delete_calendar") {
+    return "Done. The calendar has been deleted.";
+  }
+
+  if (proposal.operation_type === "delete_event") {
+    const event = extractBeforeEventFromProposalState(proposal);
+    if (event) {
+      return `Done. "${event.title}" has been removed from your calendar.`;
+    }
+    return "Done. The event has been removed from your calendar.";
+  }
+
+  if (proposal.operation_type === "move_event") {
+    const event = extractEventFromProposalState(proposal);
+    if (event) {
+      const dateLabel = formatReadableDate(event.start.slice(0, 10), defaultDate);
+      return `Done. "${event.title}" has been moved to ${dateLabel} from ${clock(event.start)} to ${clock(event.end)}.`;
+    }
+    return "Done. The event has been moved.";
+  }
+
+  if (proposal.operation_type === "update_event") {
+    const event = extractEventFromProposalState(proposal);
+    if (event) {
+      return `Done. "${event.title}" has been updated on your calendar.`;
+    }
+    return "Done. The event has been updated.";
+  }
+
+  return "Done. The calendar change has been applied.";
 }
 
 function formatApiError(error: unknown): string {
@@ -215,6 +407,83 @@ function unavailableMessageForInterpretation(error: unknown): string {
   return `The agent command interpreter is not attainable at the moment, so I cannot safely process that instruction.\n\n${formatApiError(error)}`;
 }
 
+function isContextualReadAction(
+  action: AgentAction,
+): action is ContextualReadAction {
+  return (
+    action.kind === "showEvents" ||
+    action.kind === "showConflicts" ||
+    action.kind === "showSummary" ||
+    action.kind === "showBriefing"
+  );
+}
+
+function deriveFollowUpReadAction(
+  prompt: string,
+  lastAction: ContextualReadAction | null,
+): ContextualReadAction | null {
+  if (!lastAction) {
+    return null;
+  }
+
+  const normalized = prompt
+    .trim()
+    .toLowerCase()
+    .replace(/[?!.,]/g, " ")
+    .replace(/\s+/g, " ");
+
+  const match = normalized.match(
+    /^(?:how about|what about|and|then)?\s*(yesterday|today|tomorrow)\s*$/,
+  );
+  if (!match) {
+    return null;
+  }
+
+  const offset =
+    match[1] === "yesterday" ? -1 : match[1] === "tomorrow" ? 1 : 0;
+  const anchorDate =
+    "date" in lastAction && lastAction.date ? lastAction.date : getLocalDate();
+  const nextDate = shiftIsoDate(anchorDate, offset);
+
+  if (lastAction.kind === "showBriefing") {
+    return { kind: "showBriefing", date: nextDate };
+  }
+
+  return {
+    kind: lastAction.kind,
+    calendarId: lastAction.calendarId,
+    date: nextDate,
+  };
+}
+
+function extractSuggestedActionFromClarification(
+  message: string,
+): AgentAction | null {
+  const schedule = message.match(
+    /\b(schedule|conflicts|summary)\s+for\s+(\d{4}-\d{2}-\d{2})\s+on\s+calendar\s+(\S+)\b/i,
+  );
+  if (schedule) {
+    const kind = schedule[1].toLowerCase();
+    const date = schedule[2];
+    const calendarId = schedule[3];
+
+    if (kind === "conflicts") {
+      return { kind: "showConflicts", calendarId, date };
+    }
+    if (kind === "summary") {
+      return { kind: "showSummary", calendarId, date };
+    }
+    return { kind: "showEvents", calendarId, date };
+  }
+
+  const briefing = message.match(/\bbriefing\s+for\s+(\d{4}-\d{2}-\d{2})\b/i);
+  if (briefing) {
+    return { kind: "showBriefing", date: briefing[1] };
+  }
+
+  return null;
+}
+
 function useAssistantOutput(
   setMessages: Dispatch<SetStateAction<ChatMessage[]>>,
   setPhase: Dispatch<SetStateAction<AssistantPhase>>,
@@ -299,9 +568,16 @@ export default function App() {
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isBooting, setIsBooting] = useState(false);
+  const [isAudioSpeaking, setIsAudioSpeaking] = useState(false);
   const [defaultDate, setDefaultDate] = useState(getLocalDate);
   const [defaultCalendarId, setDefaultCalendarId] = useState("primary");
   const [latestProposalId, setLatestProposalId] = useState<string | undefined>();
+  const [lastContextualReadAction, setLastContextualReadAction] =
+    useState<ContextualReadAction | null>(null);
+  const [pendingConfirmation, setPendingConfirmation] =
+    useState<PendingConfirmation | null>(null);
+  const [pendingEventDraft, setPendingEventDraft] =
+    useState<PendingEventDraft | null>(null);
 
   const logRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -398,6 +674,7 @@ export default function App() {
   };
 
   const stopPlayback = () => {
+    setIsAudioSpeaking(false);
     const audio = playbackAudioRef.current;
     if (audio) {
       audio.pause();
@@ -445,8 +722,17 @@ export default function App() {
 
       playbackAudioRef.current = audio;
       playbackUrlRef.current = url;
+      audio.onplay = () => {
+        setIsAudioSpeaking(true);
+      };
+      audio.onpause = () => {
+        if (!audio.ended) {
+          setIsAudioSpeaking(false);
+        }
+      };
 
       audio.onended = () => {
+        setIsAudioSpeaking(false);
         if (playbackAudioRef.current === audio) {
           playbackAudioRef.current = null;
         }
@@ -458,6 +744,7 @@ export default function App() {
 
       await audio.play();
     } catch {
+      setIsAudioSpeaking(false);
       stopPlayback();
     }
   };
@@ -657,7 +944,7 @@ export default function App() {
           setDefaultCalendarId(response.data.calendar_id);
         }
 
-        return formatProposalLine(response.data);
+        return formatDraftedProposalResponse(action, response.data, defaultDate);
       }
       case "executeProposal": {
         const proposalId = await resolveLatestProposal(action.proposalId);
@@ -675,7 +962,8 @@ export default function App() {
           confirmed: true,
         });
 
-        return `Proposal ${result.data.proposal_id} executed successfully for ${result.data.target_summary}.`;
+        void result;
+        return formatExecutedProposalResponse(proposal, defaultDate);
       }
       case "rejectProposal": {
         const proposalId = await resolveLatestProposal(action.proposalId);
@@ -688,7 +976,8 @@ export default function App() {
         });
 
         setLatestProposalId(proposalId);
-        return `Proposal ${result.data.proposal_id} was rejected.`;
+        void result;
+        return "Understood. I have discarded that drafted change.";
       }
     }
   };
@@ -696,9 +985,61 @@ export default function App() {
   const resolveAction = async (
     prompt: string,
   ): Promise<
-    | { kind: "clarify"; message: string }
+    | { kind: "respond"; message: string }
+    | { kind: "clarify"; message: string; suggestedAction?: AgentAction }
+    | { kind: "draft_event"; draft: PendingEventDraft; message: string }
     | { kind: "execute"; action: AgentAction; normalizedCommand?: string }
   > => {
+    const normalizedPrompt = prompt.trim().toLowerCase();
+    if (pendingConfirmation) {
+      if (/^(yes|yeah|yep|please do|do it|go ahead|sure|okay|ok)\b/.test(normalizedPrompt)) {
+        setPendingConfirmation(null);
+        return { kind: "execute", action: pendingConfirmation.action };
+      }
+
+      if (/^(no|nope|cancel|never mind|nevermind)\b/.test(normalizedPrompt)) {
+        setPendingConfirmation(null);
+        return {
+          kind: "respond",
+          message: "Understood. I will leave that request unresolved.",
+        };
+      }
+    }
+
+    if (pendingEventDraft) {
+      if (/^(cancel|stop|never mind|nevermind|nope)$/i.test(normalizedPrompt)) {
+        setPendingEventDraft(null);
+        return {
+          kind: "respond",
+          message: "Understood. I will not draft that event.",
+        };
+      }
+
+      const updatedDraft = continuePendingEventDraft(prompt, pendingEventDraft);
+      if (isEventDraftComplete(updatedDraft)) {
+        setPendingEventDraft(null);
+        return {
+          kind: "execute",
+          action: buildCreateProposalFromDraft(updatedDraft),
+        };
+      }
+
+      return {
+        kind: "draft_event",
+        draft: updatedDraft,
+        message: buildEventDraftPrompt(updatedDraft),
+      };
+    }
+
+    const contextualFollowUp = deriveFollowUpReadAction(
+      prompt,
+      lastContextualReadAction,
+    );
+    if (contextualFollowUp) {
+      setPendingConfirmation(null);
+      return { kind: "execute", action: contextualFollowUp };
+    }
+
     const direct = parseCommand(prompt, {
       defaultDate,
       defaultCalendarId,
@@ -706,7 +1047,21 @@ export default function App() {
     });
 
     if (direct) {
+      setPendingConfirmation(null);
       return { kind: "execute", action: direct };
+    }
+
+    const eventDraft = inferPendingEventDraft(prompt, {
+      defaultDate,
+      defaultCalendarId,
+      latestProposalId,
+    });
+    if (eventDraft) {
+      return {
+        kind: "draft_event",
+        draft: eventDraft,
+        message: buildEventDraftPrompt(eventDraft),
+      };
     }
 
     let interpretation;
@@ -725,7 +1080,13 @@ export default function App() {
       interpretation.data.status === "clarify" ||
       !interpretation.data.command
     ) {
-      return { kind: "clarify", message: interpretation.data.explanation };
+      return {
+        kind: "clarify",
+        message: interpretation.data.explanation,
+        suggestedAction: extractSuggestedActionFromClarification(
+          interpretation.data.explanation,
+        ) ?? undefined,
+      };
     }
 
     const normalizedAction = parseCommand(interpretation.data.command, {
@@ -742,6 +1103,7 @@ export default function App() {
       };
     }
 
+    setPendingConfirmation(null);
     return {
       kind: "execute",
       action: normalizedAction,
@@ -767,11 +1129,31 @@ export default function App() {
     try {
       const resolution = await resolveAction(text);
 
-      if (resolution.kind === "clarify") {
+      if (resolution.kind === "respond") {
         deliverAssistantText(resolution.message);
         return;
       }
 
+      if (resolution.kind === "draft_event") {
+        setPendingEventDraft(resolution.draft);
+        deliverAssistantText(resolution.message);
+        return;
+      }
+
+      if (resolution.kind === "clarify") {
+        setPendingEventDraft(null);
+        setPendingConfirmation(
+          resolution.suggestedAction
+            ? {
+                action: resolution.suggestedAction,
+              }
+            : null,
+        );
+        deliverAssistantText(resolution.message);
+        return;
+      }
+
+      setPendingEventDraft(null);
       let answer: string;
       try {
         answer = await executeAction(resolution.action);
@@ -782,12 +1164,8 @@ export default function App() {
         return;
       }
 
-      if (
-        resolution.normalizedCommand &&
-        resolution.normalizedCommand.trim().toLowerCase() !==
-          text.trim().toLowerCase()
-      ) {
-        answer = `Interpreted as: ${resolution.normalizedCommand}\n\n${answer}`;
+      if (isContextualReadAction(resolution.action)) {
+        setLastContextualReadAction(resolution.action);
       }
 
       deliverAssistantText(answer);
@@ -1081,7 +1459,9 @@ export default function App() {
   const activePhase: AssistantPhase =
     listeningMode === "wake" || listeningMode === "command"
       ? "listening"
-      : phase;
+      : isAudioSpeaking || phase === "speaking"
+        ? "speaking"
+        : phase;
 
   return (
     <div className="jarvis-shell">
