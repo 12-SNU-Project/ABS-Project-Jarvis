@@ -1,0 +1,26 @@
+{
+  "name": "jarvis-mobile",
+  "private": true,
+  "version": "0.1.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "expo": "~55.0.0",
+    "expo-linear-gradient": "~55.0.13",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
+    "react-native-svg": "15.15.3",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.0",
+    "@types/react": "^19.2.2",
+    "typescript": "^5.9.3"
+  }
+}
