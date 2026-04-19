@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Path, Query, status
+from fastapi import APIRouter, File, Path, Query, UploadFile, status
 
 from app.core.config import get_settings
 from app.core.errors import AppError, error_detail
@@ -29,8 +29,14 @@ from app.schemas.schemas import (
     PresentationDemo,
     SlackSummaryRequest,
     SlackSummaryResponse,
+    StartupGreetingRequest,
+    StartupGreetingResponse,
+    VoiceSpeechRequest,
+    VoiceSpeechResponse,
+    VoiceTranscriptionResponse,
 )
 from app.services.assistant.interpreter import interpret_agent_instruction
+from app.services.assistant.startup_greeting import create_startup_greeting
 from app.services.briefing.orchestrator import create_briefing
 from app.services.calendar import (
     create_calendar_operation_proposal,
@@ -48,6 +54,7 @@ from app.services.calendar import (
 from app.services.integrations.slack_summary import summarize_slack_channel
 from app.services.support.admin import get_admin_summary
 from app.services.support.presentation import get_presentation_demo
+from app.voice.service import synthesize_speech, transcribe_audio
 
 
 router = APIRouter(prefix="/api/v1")
@@ -308,6 +315,61 @@ def interpret_agent_route(payload: AgentInterpretRequest) -> AgentInterpretRespo
         date=payload.date,
         calendar_id=payload.calendar_id,
         latest_proposal_id=payload.latest_proposal_id,
+    )
+
+
+@router.post(
+    "/assistant/startup-greeting",
+    response_model=StartupGreetingResponse,
+    tags=["agent"],
+)
+def startup_greeting_route(
+    payload: StartupGreetingRequest,
+) -> StartupGreetingResponse:
+    return create_startup_greeting(
+        user_name=payload.user_name,
+        location=payload.location,
+        date=payload.date,
+        channel_id=payload.channel_id,
+        lookback_hours=payload.lookback_hours,
+    )
+
+
+@router.post(
+    "/voice/transcribe",
+    response_model=VoiceTranscriptionResponse,
+    tags=["voice"],
+)
+async def transcribe_voice_route(
+    audio: UploadFile = File(..., description="Recorded user audio for transcription."),
+) -> VoiceTranscriptionResponse:
+    audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise AppError(
+            code="voice_empty_audio",
+            message="Uploaded audio file was empty.",
+            status_code=422,
+            details=[error_detail("audio", "Uploaded audio file was empty.", "voice_empty_audio")],
+        )
+
+    return transcribe_audio(
+        audio_bytes=audio_bytes,
+        filename=audio.filename or "recording.webm",
+        content_type=audio.content_type,
+    )
+
+
+@router.post(
+    "/voice/speak",
+    response_model=VoiceSpeechResponse,
+    tags=["voice"],
+)
+def synthesize_voice_route(payload: VoiceSpeechRequest) -> VoiceSpeechResponse:
+    return synthesize_speech(
+        text=payload.text,
+        instructions=payload.instructions,
+        voice=payload.voice,
+        response_format=payload.response_format,
     )
 
 

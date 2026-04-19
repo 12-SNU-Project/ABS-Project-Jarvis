@@ -220,3 +220,26 @@ def test_openapi_agent_interpret_contract_is_documented(client) -> None:
     assert operation["responses"]["503"]["content"]["application/json"]["schema"]["$ref"] == (
         "#/components/schemas/ErrorResponse"
     )
+
+
+def test_openapi_voice_contract_is_documented(client) -> None:
+    schema = _openapi_schema(client)
+    paths = schema["paths"]
+
+    transcribe_post = paths["/api/v1/voice/transcribe"]["post"]
+    speak_post = paths["/api/v1/voice/speak"]["post"]
+
+    assert transcribe_post["tags"] == ["voice"]
+    assert transcribe_post["requestBody"]["required"] is True
+    assert "multipart/form-data" in transcribe_post["requestBody"]["content"]
+    assert transcribe_post["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/VoiceTranscriptionResponse"
+    )
+
+    assert speak_post["tags"] == ["voice"]
+    assert speak_post["requestBody"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/VoiceSpeechRequest"
+    )
+    assert speak_post["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/VoiceSpeechResponse"
+    )

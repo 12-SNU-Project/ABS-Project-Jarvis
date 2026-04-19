@@ -759,6 +759,95 @@ class AgentInterpretResponse(FeatureResponse):
     )
 
 
+class AssistantServiceStatus(BaseModel):
+    service: str = Field(description="Service or subsystem name.", examples=["weather"])
+    status: str = Field(
+        description="Current availability state.", examples=["ok", "degraded", "unconfigured"]
+    )
+    message: str = Field(
+        description="Human-readable service note or degradation reason."
+    )
+
+
+class StartupGreetingRequest(BaseModel):
+    user_name: str = Field(default="Team Jarvis")
+    location: str = Field(default="Seoul")
+    date: str = Field(default="2026-04-18")
+    channel_id: str | None = Field(
+        default=None,
+        description="Optional Slack channel override for the startup summary.",
+    )
+    lookback_hours: int | None = Field(
+        default=None,
+        ge=1,
+        le=168,
+        description="Optional Slack lookback override in hours.",
+    )
+
+
+class StartupGreetingResponse(FeatureResponse):
+    date: str
+    location: str
+    source: str = Field(description="Greeting generation source.", examples=["openai", "fallback"])
+    greeting: str = Field(description="Startup greeting shown in the chat window.")
+    services: list[AssistantServiceStatus] = Field(
+        default_factory=list,
+        description="Per-service availability notes gathered while building the greeting.",
+    )
+
+
+class VoiceSpeechRequest(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "examples": [
+                {
+                    "text": "Good morning. Your schedule is loaded and ready for review.",
+                    "instructions": "Speak in a poised, concise assistant tone.",
+                    "voice": "cedar",
+                    "response_format": "wav",
+                }
+            ]
+        },
+    )
+
+    text: str = Field(description="Text to synthesize into speech.")
+    instructions: str | None = Field(
+        default=None,
+        description="Optional vocal style or delivery instructions for synthesis.",
+    )
+    voice: str | None = Field(
+        default=None,
+        description="Voice identifier to use for synthesis.",
+        examples=["cedar"],
+    )
+    response_format: str = Field(
+        default="wav",
+        description="Requested output audio format.",
+        examples=["wav"],
+    )
+
+
+class VoiceTranscriptionResponse(FeatureResponse):
+    transcript: str = Field(description="Transcribed text from the uploaded audio.")
+    filename: str = Field(description="Original uploaded filename.")
+    content_type: str = Field(description="Detected or provided audio MIME type.")
+    model: str = Field(description="Speech-to-text model used for transcription.")
+    source: str = Field(description="Transcription provider identifier.")
+
+
+class VoiceSpeechResponse(FeatureResponse):
+    text: str = Field(description="Input text that was synthesized.")
+    model: str = Field(description="Text-to-speech model used for synthesis.")
+    voice: str = Field(description="Voice identifier used for synthesis.")
+    response_format: str = Field(description="Generated audio format.")
+    mime_type: str = Field(description="MIME type of the generated audio.")
+    audio_base64: str = Field(
+        description="Base64 encoded audio payload for immediate client playback."
+    )
+    source: str = Field(description="Speech provider identifier.")
+
+
 class SlackChannelSummary(BaseModel):
     channel: str
     summary: str
