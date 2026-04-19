@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 import hashlib
 import json
 from copy import deepcopy
@@ -7,6 +8,7 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from app.services.logging_service import log_feature_run
 from app.core.config import get_settings
 from app.core.errors import AppError
 from app.providers.calendar_provider import (
@@ -17,7 +19,7 @@ from app.providers.calendar_provider import (
 )
 
 
-CALENDAR_OWNER = ""
+CALENDAR_OWNER = "김재희"
 CALENDAR_FEATURE = "calendar"
 CALENDAR_BUFFER_MINUTES = 30
 
@@ -131,12 +133,41 @@ def get_calendar_events_response(
 def get_calendar_brief(date: str, calendar_id: str = "primary") -> dict[str, Any]:
     from app.services.calendar_conflicts import get_calendar_summary_response
 
-    summary = get_calendar_summary_response(calendar_id, date_value=date)
-    return {
-        **base_calendar_payload(),
-        "calendar_id": calendar_id,
-        "date": summary["date"],
-        "summary": summary["summary"],
-        "events": summary["events"],
-        "conflicts": summary["conflicts"],
-    }
+    start_time = time.time()
+    status = "success"
+    try:
+        summary = get_calendar_summary_response(calendar_id, date_value=date)
+        result = {
+            **base_calendar_payload(),
+            "calendar_id": calendar_id,
+            "date": summary["date"],
+            "summary": summary["summary"],
+            "events": summary["events"],
+            "conflicts": summary["conflicts"],
+        }
+    except Exception as e:
+        status = "fail"
+        result = {
+            **base_calendar_payload(),
+            "calendar_id": calendar_id,
+            "date": date,
+            "summary": None,
+            "events": [],
+            "conflicts": [],
+            "error": str(e),
+        }
+        raise
+    finally:
+        end_time = time.time()
+        log_feature_run(
+            run_id=f"calendar-{int(start_time)}",
+            feature="calendar",
+            owner=CALENDAR_OWNER,
+            status=status,
+            used_llm=False,
+            latency_ms=int((end_time - start_time) * 1000),
+            prompt_tokens=None,
+            completion_tokens=None,
+            total_tokens=None,
+        )
+    return result
