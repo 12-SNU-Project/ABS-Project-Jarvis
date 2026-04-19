@@ -114,33 +114,195 @@
 
 - 담당자: 김재희
 - 파일: `backend/app/services/calendar.py`
-- 함수: `get_calendar_brief(date: str) -> CalendarBrief`
+- 대표 함수: `get_calendar_brief(date: str, calendar_id: str = "primary") -> CalendarBrief`
 - 참고 목업: `backend/app/data/mocks/calendar.json`
+
+현재 구조
+
+- `backend/app/services/calendar.py`
+  - 캘린더 도메인 facade
+  - 다른 레이어는 이 파일만 import해도 되도록 유지
+- 실제 읽기/쓰기 로직은 아래로 분리됨
+  - `backend/app/services/calendar_read.py`
+  - `backend/app/services/calendar_conflicts.py`
+  - `backend/app/services/calendar_write.py`
+  - `backend/app/services/calendar_audit.py`
+
+현재 캘린더는 단순 브리핑용 mock 함수만 있는 상태가 아니라,
+
+- 브리핑용 일정 요약
+- 일정 조회
+- 충돌 탐지
+- 제안 기반 일정 수정(create/update/move/delete)
+- 제안 실행/거절
+- audit log
+
+까지 포함하는 구조로 확장되어 있습니다.
 
 입력
 
 - `date`
   - 날짜 문자열
   - 예시: `"2026-04-18"`
+- `calendar_id`
+  - 선택값
+  - 기본값: `"primary"`
+  - 예시: `"primary"`
 
 출력
 
 - 필수 키
   - `owner`
   - `feature`
+  - `calendar_id`
   - `date`
   - `summary`
   - `events`
   - `conflicts`
   - `uses_mock`
 
-`events` 내부 권장 키
+`events` 내부 현재 키
 
+- `id`
+- `calendar_id`
 - `title`
 - `start`
 - `end`
+- `description`
 - `location`
 - `priority`
+- `all_day`
+- `recurring`
+- `recurrence_rule`
+- `recurrence_interval_days`
+- `recurrence_count`
+- `series_id`
+
+`conflicts` 내부 현재 키
+
+- `type`
+- `message`
+- `severity`
+- `event_ids`
+
+현재 `get_calendar_brief()` 출력 예시
+
+```json
+{
+  "owner": "",
+  "feature": "calendar",
+  "uses_mock": true,
+  "calendar_id": "primary",
+  "date": "2026-04-18",
+  "summary": "5 scheduled event(s) for 2026-04-18, including 2 high-priority item(s). No timing conflicts detected.",
+  "events": [
+    {
+      "id": "evt-1",
+      "calendar_id": "primary",
+      "title": "데일리 스탠드업",
+      "start": "2026-04-18T09:30:00+09:00",
+      "end": "2026-04-18T10:00:00+09:00",
+      "description": null,
+      "location": "Zoom",
+      "priority": "high",
+      "all_day": false,
+      "recurring": false,
+      "recurrence_rule": null,
+      "recurrence_interval_days": null,
+      "recurrence_count": null,
+      "series_id": null
+    }
+  ],
+  "conflicts": []
+}
+```
+
+추가 조회 함수
+
+- `list_calendars_response()`
+  - 현재 사용 가능한 calendar 목록 반환
+- `get_calendar_detail_response(calendar_id: str)`
+  - 단일 calendar metadata 반환
+- `get_calendar_events_response(calendar_id: str, *, date_value: str | None = None, start_date: str | None = None, end_date: str | None = None)`
+  - 단일 날짜 또는 날짜 범위의 event 목록 반환
+- `get_calendar_conflicts_response(calendar_id: str, *, date_value: str | None = None, start_date: str | None = None, end_date: str | None = None)`
+  - 충돌 목록 반환
+- `get_calendar_summary_response(calendar_id: str, *, date_value: str | None = None, start_date: str | None = None, end_date: str | None = None)`
+  - summary + events + conflicts 반환
+
+날짜 조회 규칙
+
+- `date` 하나만 쓰거나
+- `start_date` + `end_date`를 같이 써야 함
+- 둘을 섞으면 `422`
+
+현재 mutation 구조
+
+- 직접 수정하지 않고 먼저 proposal을 만듭니다.
+- proposal을 나중에 execute 하거나 reject 합니다.
+- 현재 지원 operation
+  - `create_event`
+  - `update_event`
+  - `move_event`
+  - `delete_event`
+  - `create_calendar`
+  - `delete_calendar`
+
+proposal request 주요 키
+
+- `operation_type`
+- `actor`
+- `calendar_id`
+- `event_id`
+- `recurring_scope`
+- `event`
+- `calendar`
+
+proposal response 주요 키
+
+- `proposal_id`
+- `operation_type`
+- `status`
+- `actor`
+- `target_summary`
+- `calendar_id`
+- `event_id`
+- `recurring_scope`
+- `requires_confirmation`
+- `warnings`
+- `before_state`
+- `after_state`
+- `snapshot_hash`
+- `created_at`
+- `executed_at`
+- `error_message`
+
+execute request 주요 키
+
+- `proposal_id`
+- `snapshot_hash`
+- `confirmed`
+
+reject request 주요 키
+
+- `proposal_id`
+- `reason`
+
+audit record 주요 키
+
+- `audit_id`
+- `proposal_id`
+- `operation_type`
+- `actor`
+- `calendar_id`
+- `event_id`
+- `recurring_scope`
+- `warnings`
+- `before_state`
+- `after_state`
+- `result_status`
+- `error_message`
+- `recorded_at`
 
 1차 목표
 
