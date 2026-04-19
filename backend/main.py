@@ -1,4 +1,6 @@
 from __future__ import annotations
+from app.services.sqlite import init_db
+
 
 from typing import Any
 
@@ -18,6 +20,14 @@ app = FastAPI(
     version="0.2.0",
     description="Professional MVP architecture for a multi-agent Jarvis assistant",
 )
+
+
+# DB 초기화: FastAPI startup 이벤트에서 1회만 호출
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

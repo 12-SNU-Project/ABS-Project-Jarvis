@@ -58,8 +58,13 @@ def get_admin_summary() -> dict:
            (now - parse_created_at(l["created_at"])).total_seconds() <= 86400
     ]
 
-    # 기능별 집계
+    # LLM/비LLM 구분
+    llm_logs = [l for l in logs_24h if l.get("used_llm")]
+    non_llm_logs = [l for l in logs_24h if not l.get("used_llm")]
+
+    # 기능별 집계 (NoneType 안전 처리)
     feature_stats = {}
+    feature_statuses = {}
     for l in logs_24h:
         f = l["feature"]
         if f not in feature_stats:
@@ -70,19 +75,34 @@ def get_admin_summary() -> dict:
                 "owner": l.get("owner", ""),
                 "statuses": [],
             }
+            feature_statuses[f] = {"success": 0, "fail": 0, "other": 0}
         feature_stats[f]["count"] += 1
-        feature_stats[f]["token_sum"] += l.get("total_tokens", 0)
-        feature_stats[f]["latency_sum"] += l.get("latency_ms", 0)
+        # 토큰 집계: NoneType 안전, LLM만
+        t = l.get("total_tokens")
+        if l.get("used_llm") and isinstance(t, int):
+            feature_stats[f]["token_sum"] += t
+        # latency_ms 집계: NoneType 안전
+        latency = l.get("latency_ms")
+        if isinstance(latency, int):
+            feature_stats[f]["latency_sum"] += latency
         feature_stats[f]["statuses"].append((l.get("created_at", ""), l.get("status", "unknown")))
+        # 성공/실패/기타 카운트
+        status = l.get("status", "other")
+        if status == "success":
+            feature_statuses[f]["success"] += 1
+        elif status == "fail":
+            feature_statuses[f]["fail"] += 1
+        else:
+            feature_statuses[f]["other"] += 1
 
-    # summary 문자열 생성
+    # summary 문자열 생성 (LLM만 토큰 집계)
     summary_parts = [
         f"{f} {v['count']}회(총 {v['token_sum']}토큰)"
         for f, v in feature_stats.items()
     ]
     summary = "최근 24시간 동안 " + ", ".join(summary_parts)
 
-    # top_token_feature 계산
+    # top_token_feature 계산 (LLM만)
     top_token_feature = None
     top_token_amount = 0
     for f, v in feature_stats.items():
@@ -90,7 +110,7 @@ def get_admin_summary() -> dict:
             top_token_feature = f
             top_token_amount = v["token_sum"]
 
-    # metrics 생성
+    # metrics 생성 (기존 구조)
     metrics = []
     for f, v in feature_stats.items():
         # 가장 최근 실행의 status
@@ -103,6 +123,43 @@ def get_admin_summary() -> dict:
             "status": recent_status,
         })
 
+    # 기능 호출 순서 (최신순)
+    feature_order = [l["feature"] for l in sorted(logs_24h, key=lambda x: x["created_at"], reverse=True)]
+
+    # LLM/비LLM metrics 별도 집계
+    def build_metrics(logs):
+        stats = {}
+        for l in logs:
+            f = l["feature"]
+            if f not in stats:
+                stats[f] = {
+                    "count": 0,
+                    "token_sum": 0,
+                    "latency_sum": 0,
+                    "owner": l.get("owner", ""),
+                }
+            stats[f]["count"] += 1
+            t = l.get("total_tokens")
+            if isinstance(t, int):
+                stats[f]["token_sum"] += t
+            latency = l.get("latency_ms")
+            if isinstance(latency, int):
+                stats[f]["latency_sum"] += latency
+        # 평균 latency, 토큰 등
+        return [
+            {
+                "feature": f,
+                "owner": v["owner"],
+                "count": v["count"],
+                "token_sum": v["token_sum"],
+                "latency_avg": int(v["latency_sum"] / v["count"]) if v["count"] else 0,
+            }
+            for f, v in stats.items()
+        ]
+
+    llm_metrics = build_metrics(llm_logs)
+    non_llm_metrics = build_metrics(non_llm_logs)
+
     # flow 데이터는 mock fallback
     data = load_mock("admin")
     return {
@@ -111,6 +168,10 @@ def get_admin_summary() -> dict:
         "summary": summary,
         "top_token_feature": f"{top_token_feature} ({top_token_amount}토큰)" if top_token_feature else None,
         "metrics": metrics,
+        "feature_order": feature_order,
+        "feature_statuses": feature_statuses,
+        "llm_metrics": llm_metrics,
+        "non_llm_metrics": non_llm_metrics,
         "flow_nodes": data["flow_nodes"],
         "flow_edges": data["flow_edges"],
         "uses_mock": False,
