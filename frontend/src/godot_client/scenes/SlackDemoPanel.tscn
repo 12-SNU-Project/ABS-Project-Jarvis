@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/slack_panel.gd" id="1_script"]
 
@@ -32,14 +32,26 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.15, 0.35, 0.15, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 16.0
-content_margin_top = 8.0
-content_margin_right = 16.0
-content_margin_bottom = 8.0
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_section"]
+bg_color = Color(0.08, 0.09, 0.13, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.15, 0.17, 0.23, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
 bg_color = Color(0.24, 0.48, 0.88, 1)
@@ -49,136 +61,253 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [node name="SlackDemoPanel" type="PanelContainer"]
-custom_minimum_size = Vector2(500, 0)
+custom_minimum_size = Vector2(750, 0)
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("1_script")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
-[node name="HeaderBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="BadgeRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/HeaderBox"]
+[node name="HeaderBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Badge" type="Label" parent="MarginContainer/VBoxContainer/HeaderBox/BadgeRow"]
+[node name="Badge" type="Label" parent="MarginContainer/VBoxContainer/HeaderBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
 text = "Slack Feature"
 
-[node name="Title" type="Label" parent="MarginContainer/VBoxContainer/HeaderBox"]
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HeaderBox"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-text = "Slack Summary Demo"
-
-[node name="Description" type="Label" parent="MarginContainer/VBoxContainer/HeaderBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
-theme_override_font_sizes/font_size = 13
-text = "버튼형 구조에서 바로 데모할 수 있도록, 채널 ID를 입력하고 실시간으로 Slack 요약 결과를 확인하는 화면입니다."
-autowrap_mode = 2
+size_flags_horizontal = 3
 
 [node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer/HeaderBox"]
 layout_mode = 2
-size_flags_horizontal = 0
 theme_override_colors/font_color = Color(0.5, 0.8, 0.6, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_status")
-text = "((o)) FastAPI REST Endpoint Connected"
+text = "● REST Endpoint Connected"
 
-[node name="FormBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="ContentRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="LeftPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 
-[node name="ChannelBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/FormBox"]
+[node name="SummaryLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+text = "Summary"
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/FormBox/ChannelBox"]
+[node name="SummaryScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
+custom_minimum_size = Vector2(0, 160)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SummaryContent" type="RichTextLabel" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/SummaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/normal_font_size = 13
+theme_override_colors/default_color = Color(0.75, 0.78, 0.85, 1)
+bbcode_enabled = true
+text = "[color=#888]결과가 여기에 표시됩니다.\n요약 버튼을 눌러 Slack 데이터를 불러오세요.[/color]"
+fit_content = true
+autowrap_mode = 2
+
+[node name="Divider" type="HSeparator" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
+layout_mode = 2
+theme_override_colors/color = Color(0.18, 0.20, 0.27, 1)
+
+[node name="QueryLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+text = "Query"
+
+[node name="ChannelBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ChannelLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/ChannelBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Channel ID"
 
-[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/FormBox/ChannelBox"]
-custom_minimum_size = Vector2(0, 36)
+[node name="ChannelEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/ChannelBox"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "C0A46076AEM"
 
-[node name="Row2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/FormBox"]
+[node name="Row2" type="HBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="DateBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/FormBox/Row2"]
+[node name="DateBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/FormBox/Row2/DateBox"]
+[node name="DateLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2/DateBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Date"
 
-[node name="LineEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/FormBox/Row2/DateBox"]
-custom_minimum_size = Vector2(0, 36)
+[node name="DateEdit" type="LineEdit" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2/DateBox"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "2026-04-19"
 
-[node name="HoursBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/FormBox/Row2"]
+[node name="HoursBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/FormBox/Row2/HoursBox"]
+[node name="HoursLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2/HoursBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "Lookback Hours"
 
-[node name="SpinBox" type="SpinBox" parent="MarginContainer/VBoxContainer/FormBox/Row2/HoursBox"]
-custom_minimum_size = Vector2(0, 36)
+[node name="HoursSpin" type="SpinBox" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel/Row2/HoursBox"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 value = 24.0
 
-[node name="PromptBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/FormBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/FormBox/PromptBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 13
-text = "Prompt"
-
-[node name="TextEdit" type="TextEdit" parent="MarginContainer/VBoxContainer/FormBox/PromptBox"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-text = "최근 1일 대화 핵심을 5줄로 요약해줘"
-wrap_mode = 1
-
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="SubmitBtn" type="Button" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 45)
+[node name="SubmitBtn" type="Button" parent="MarginContainer/VBoxContainer/ContentRow/LeftPanel"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "Slack 요약 불러오기"
+
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/ContentRow"]
+layout_mode = 2
+theme_override_colors/color = Color(0.18, 0.20, 0.27, 1)
+
+[node name="RightPanel" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="RawLabel" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+text = "Raw Messages"
+
+[node name="MsgScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MsgList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Msg1" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="User" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "U0A3T2ANT50"
+
+[node name="Text" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg1"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "주말까지 해야하는 과제가 뭐가 있지?"
+autowrap_mode = 2
+
+[node name="Msg2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="User" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "U0ATPMEAOBX"
+
+[node name="Text" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "핀테크와 암호 과제해야해"
+autowrap_mode = 2
+
+[node name="Msg3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="User" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "U0ATPMEAOBX"
+
+[node name="Text" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "과제 1,2가 내일까지 제출이야"
+autowrap_mode = 2
+
+[node name="Msg4" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="User" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "U0A3T2ANT50"
+
+[node name="Text" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "주말까지 해야하는 과제인가 그게?"
+autowrap_mode = 2
+
+[node name="Msg5" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="User" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg5"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "U0ATPMEAOBX"
+
+[node name="Text" type="Label" parent="MarginContainer/VBoxContainer/ContentRow/RightPanel/MsgScroll/MsgList/Msg5"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "암호문 과제는 설명 PDF를 다시 읽어봐야 할 정도야. 연습문제랑 파이썬 코딩이 섞여있어서 혼선이 있었어."
+autowrap_mode = 2
