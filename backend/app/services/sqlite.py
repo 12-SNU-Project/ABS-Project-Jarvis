@@ -2,7 +2,6 @@ import sqlite3
 import os
 
 DB_PATH = os.path.join(os.path.dirname(__file__), '../data/feature_runs.db')
-print(f"SQLite DB Path: {DB_PATH}")  # 디버깅용 출력
 
 def get_db_connection():
     conn = sqlite3.connect(DB_PATH)

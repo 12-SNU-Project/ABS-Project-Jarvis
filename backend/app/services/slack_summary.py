@@ -10,6 +10,7 @@ from slack_sdk.errors import SlackApiError
 
 from app.core.config import get_settings
 from app.providers.mock_provider import load_mock
+from .logging_service import extract_openai_response_metrics, log_feature_run
 
 
 def _normalize_text(text: str) -> str:
@@ -123,7 +124,7 @@ def _summarize_with_openai(
     lookback_hours: int,
     model: str,
     api_key: str,
-) -> list[str]:
+) -> tuple[list[str], dict[str, int]]:
     if not messages:
         return [
             f"{channel_name} 채널에 최근 {lookback_hours}시간 동안 확인할 메시지가 없습니다.",
@@ -131,7 +132,7 @@ def _summarize_with_openai(
             "새 대화가 쌓이면 다시 요약하면 됩니다.",
             "필요하면 조회 기간을 늘려 다시 요약할 수 있습니다.",
             "현재는 공유할 결정사항이나 액션 아이템이 없습니다.",
-        ]
+        ], {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 
     transcript = "\n".join(
         f"- {message['user']}: {message['text'][:500]}" for message in messages
@@ -159,6 +160,7 @@ def _summarize_with_openai(
             },
         ],
     )
+    metrics = extract_openai_response_metrics(response)
     raw_text = (response.output_text or "").strip()
     lines = [line.strip("-• ").strip() for line in raw_text.splitlines() if line.strip()]
     if len(lines) == 1:
@@ -166,7 +168,7 @@ def _summarize_with_openai(
     lines = lines[:SUMMARY_LINE_COUNT]
     while len(lines) < SUMMARY_LINE_COUNT:
         lines.append("추가로 확인된 중요한 내용은 없습니다.")
-    return lines
+    return lines, metrics
 
 
 def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookback_hours: int) -> dict[str, Any]:
@@ -210,7 +212,7 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
         raise RuntimeError(f"Failed to read Slack messages: {exc}") from exc
 
     try:
-        summary_lines = _summarize_with_openai(
+        summary_lines, metrics = _summarize_with_openai(
             messages=messages,
             user_input=user_input,
             channel_name=channel_name,
@@ -220,6 +222,19 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
         )
     except Exception as exc:
         raise RuntimeError(f"OpenAI summarization failed: {exc}") from exc
+    
+    log_feature_run(
+        run_id=f"slack_summary-{int(time.time())}",
+        feature="slack_summary",
+        owner="문이현",
+        status="success",
+        uses_mock=False,
+        latency_ms=metrics.get("latency_sec", 0) * 1000,
+        prompt_tokens=metrics.get("input_tokens", 0),
+        completion_tokens=metrics.get("output_tokens", 0),
+        total_tokens=metrics.get("total_tokens", 0),
+    )
+    
     return {
         "owner": "문이현",
         "feature": "slack_summary",
