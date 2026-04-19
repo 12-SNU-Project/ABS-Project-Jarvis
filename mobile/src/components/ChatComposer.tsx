@@ -1,11 +1,5 @@
 import { memo } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 type ChatComposerProps = {
   value: string;
@@ -22,16 +16,19 @@ function ChatComposerInner({
 }: ChatComposerProps) {
   return (
     <View style={styles.wrap}>
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder="Type your next instruction..."
-        placeholderTextColor="#6f8a9e"
-        style={styles.input}
-        multiline
-        editable={!disabled}
-      />
+      <View style={styles.inputShell}>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder="Issue a command..."
+          placeholderTextColor="#6f8da2"
+          style={styles.input}
+          multiline
+          editable={!disabled}
+        />
+      </View>
       <Pressable
+        accessibilityRole="button"
         onPress={onSend}
         disabled={disabled}
         style={({ pressed }) => [
@@ -40,7 +37,7 @@ function ChatComposerInner({
           pressed && !disabled && styles.buttonPressed,
         ]}
       >
-        <Text style={styles.buttonText}>Send</Text>
+        <Text style={styles.buttonGlyph}>↑</Text>
       </Pressable>
     </View>
   );
@@ -52,44 +49,51 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 10,
+    gap: 9,
     paddingHorizontal: 14,
-    paddingBottom: 14,
-    paddingTop: 10,
+    paddingTop: 8,
+    paddingBottom: 12,
   },
-  input: {
+  inputShell: {
     flex: 1,
     minHeight: 54,
-    maxHeight: 112,
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "rgba(109,220,255,0.18)",
-    backgroundColor: "rgba(3,11,22,0.9)",
-    color: "#ecfbff",
+    borderColor: "rgba(109,220,255,0.08)",
+    backgroundColor: "rgba(3,10,20,0.82)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  input: {
+    color: "#edf8ff",
     fontSize: 15,
     lineHeight: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    minHeight: 38,
+    maxHeight: 104,
+    paddingVertical: 8,
   },
   button: {
-    minWidth: 84,
-    height: 54,
-    borderRadius: 18,
+    width: 52,
+    height: 52,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#ffab63",
+    backgroundColor: "#f6a15b",
+    shadowColor: "#ff9b52",
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 7 },
   },
   buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   buttonPressed: {
     transform: [{ scale: 0.98 }],
   },
-  buttonText: {
-    color: "#09121d",
-    fontSize: 13,
+  buttonGlyph: {
+    color: "#08111b",
+    fontSize: 22,
     fontWeight: "800",
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
+    lineHeight: 24,
   },
 });

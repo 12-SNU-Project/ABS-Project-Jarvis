@@ -10,13 +10,17 @@ function MessageBubbleInner({ message }: { message: ChatMessage }) {
     <View
       style={[
         styles.wrap,
-        isAssistant ? styles.wrapAssistant : styles.wrapUser,
+        isAssistant ? styles.assistantWrap : styles.userWrap,
       ]}
     >
-      <Text style={[styles.role, isAssistant ? styles.roleAssistant : styles.roleUser]}>
-        {isAssistant ? "JARVIS" : "You"}
+      <Text
+        style={[styles.role, isAssistant ? styles.roleAssistant : styles.roleUser]}
+      >
+        {isAssistant ? "JARVIS" : "OPERATOR"}
       </Text>
-      <Text style={styles.text}>{message.text}</Text>
+      <Text style={[styles.text, isAssistant ? styles.assistantText : styles.userText]}>
+        {message.text}
+      </Text>
     </View>
   );
 }
@@ -25,38 +29,44 @@ export const MessageBubble = memo(MessageBubbleInner);
 
 const styles = StyleSheet.create({
   wrap: {
-    maxWidth: "92%",
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 1,
+    maxWidth: "90%",
   },
-  wrapAssistant: {
+  assistantWrap: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(10,18,34,0.86)",
-    borderColor: "rgba(109,220,255,0.14)",
+    paddingRight: 22,
+    paddingLeft: 2,
   },
-  wrapUser: {
+  userWrap: {
     alignSelf: "flex-end",
-    backgroundColor: "rgba(18,39,65,0.92)",
-    borderColor: "rgba(109,220,255,0.24)",
+    paddingHorizontal: 15,
+    paddingVertical: 13,
+    borderRadius: 18,
+    borderTopRightRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255,179,112,0.16)",
+    backgroundColor: "rgba(34,22,16,0.76)",
   },
   role: {
-    marginBottom: 6,
-    fontSize: 10,
-    fontWeight: "800",
-    letterSpacing: 1.8,
+    marginBottom: 5,
+    fontSize: 9,
+    fontWeight: "700",
+    letterSpacing: 2.6,
     textTransform: "uppercase",
   },
   roleAssistant: {
-    color: "#6de4ff",
+    color: "rgba(113,229,255,0.76)",
   },
   roleUser: {
-    color: "#d3f6ff",
+    color: "#ffc795",
   },
   text: {
-    color: "#edfaff",
     fontSize: 15,
-    lineHeight: 21,
+    lineHeight: 23,
+  },
+  assistantText: {
+    color: "#eef8fe",
+  },
+  userText: {
+    color: "#fff2e6",
   },
 });
