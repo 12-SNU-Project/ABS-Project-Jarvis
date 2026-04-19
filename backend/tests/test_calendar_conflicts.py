@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.services.calendar_conflicts import detect_conflicts
+from app.services.calendar.conflicts import detect_conflicts
 
 
 def make_event(event_id: str, title: str, start: str, end: str) -> dict[str, str]:

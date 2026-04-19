@@ -5,7 +5,7 @@ from datetime import datetime
 import pytest
 
 from app.core.errors import AppError
-from app.services.calendar_read import resolve_range
+from app.services.calendar.read import resolve_range
 
 
 def test_default_timezone_changes_default_window_boundaries(monkeypatch: pytest.MonkeyPatch) -> None:

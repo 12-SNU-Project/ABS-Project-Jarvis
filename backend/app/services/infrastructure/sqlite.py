@@ -1,10 +1,11 @@
+from pathlib import Path
 import sqlite3
-import os
 
-DB_PATH = os.path.join(os.path.dirname(__file__), '../data/feature_runs.db')
-print(f"SQLite DB Path: {DB_PATH}")  # 디버깅용 출력
+
+DB_PATH = Path(__file__).resolve().parents[2] / "data" / "feature_runs.db"
 
 def get_db_connection():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn

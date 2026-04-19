@@ -57,7 +57,7 @@ def test_agent_interpret_normalizes_natural_language_command(
         }
 
     monkeypatch.setattr(
-        "app.services.agent_interpreter._post_openai_responses",
+        "app.services.assistant.interpreter._post_openai_responses",
         fake_post_openai_responses,
     )
 

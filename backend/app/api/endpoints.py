@@ -30,8 +30,8 @@ from app.schemas.schemas import (
     SlackSummaryRequest,
     SlackSummaryResponse,
 )
-from app.services.admin import get_admin_summary
-from app.services.agent_interpreter import interpret_agent_instruction
+from app.services.assistant.interpreter import interpret_agent_instruction
+from app.services.briefing.orchestrator import create_briefing
 from app.services.calendar import (
     create_calendar_operation_proposal,
     execute_calendar_operation,
@@ -45,9 +45,9 @@ from app.services.calendar import (
     list_calendars_response,
     reject_calendar_operation,
 )
-from app.services.orchestrator import create_briefing
-from app.services.slack_summary import summarize_slack_channel
-from app.services.presentation import get_presentation_demo
+from app.services.integrations.slack_summary import summarize_slack_channel
+from app.services.support.admin import get_admin_summary
+from app.services.support.presentation import get_presentation_demo
 
 
 router = APIRouter(prefix="/api/v1")

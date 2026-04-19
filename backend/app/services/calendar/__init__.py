@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-from app.services.calendar_audit import (
+from .audit import (
     execute_calendar_operation,
     get_calendar_audit_log,
     get_calendar_operation_proposal,
     list_calendar_operation_proposals,
     reject_calendar_operation,
 )
-from app.services.calendar_conflicts import (
+from .conflicts import (
     get_calendar_conflicts_response,
     get_calendar_summary_response,
 )
-from app.services.calendar_read import (
+from .read import (
     get_calendar_brief,
     get_calendar_detail_response,
     get_calendar_events_response,
     list_calendars_response,
 )
-from app.services.calendar_write import create_calendar_operation_proposal
+from .write import create_calendar_operation_proposal
 
 
 __all__ = [

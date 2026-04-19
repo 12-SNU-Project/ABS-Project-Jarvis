@@ -129,7 +129,7 @@ def get_calendar_events_response(
 
 
 def get_calendar_brief(date: str, calendar_id: str = "primary") -> dict[str, Any]:
-    from app.services.calendar_conflicts import get_calendar_summary_response
+    from .conflicts import get_calendar_summary_response
 
     summary = get_calendar_summary_response(calendar_id, date_value=date)
     return {

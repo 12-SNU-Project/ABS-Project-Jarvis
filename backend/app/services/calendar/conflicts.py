@@ -4,7 +4,8 @@ from datetime import timedelta
 from typing import Any
 
 from app.providers.calendar_provider import get_calendar, list_events, load_calendar_state
-from app.services.calendar_read import (
+
+from .read import (
     CALENDAR_BUFFER_MINUTES,
     base_calendar_payload,
     parse_datetime,

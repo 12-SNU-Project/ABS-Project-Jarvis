@@ -13,12 +13,13 @@ from app.providers.calendar_provider import (
     replace_proposal,
     save_calendar_state,
 )
-from app.services.calendar_read import (
+
+from .read import (
     base_calendar_payload,
     current_timestamp,
     schedule_snapshot_hash,
 )
-from app.services.calendar_write import apply_operation
+from .write import apply_operation
 
 
 def proposal_view(proposal: dict[str, Any]) -> dict[str, Any]:

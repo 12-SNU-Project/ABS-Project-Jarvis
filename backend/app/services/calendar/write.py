@@ -18,8 +18,9 @@ from app.providers.calendar_provider import (
     store_proposal,
     update_event,
 )
-from app.services.calendar_conflicts import detect_conflicts
-from app.services.calendar_read import current_timestamp, parse_datetime, schedule_snapshot_hash
+
+from .conflicts import detect_conflicts
+from .read import current_timestamp, parse_datetime, schedule_snapshot_hash
 
 
 def validate_event_payload(

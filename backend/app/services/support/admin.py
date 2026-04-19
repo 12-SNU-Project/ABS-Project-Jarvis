@@ -2,8 +2,9 @@ from __future__ import annotations
 from collections import defaultdict
 
 from app.providers.mock_provider import load_mock
-from .logging_service import get_recent_feature_runs
-from .sqlite import init_db
+
+from ..infrastructure.logging_service import get_recent_feature_runs
+from ..infrastructure.sqlite import init_db
 
 
 def get_admin_summary() -> dict:

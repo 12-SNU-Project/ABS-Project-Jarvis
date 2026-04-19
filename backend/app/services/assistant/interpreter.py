@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import socket
 from typing import Any
 from urllib import error as urllib_error
 from urllib import request as urllib_request
@@ -8,7 +9,8 @@ from urllib import request as urllib_request
 from app.core.config import get_settings
 from app.core.errors import AppError
 from app.schemas.schemas import AgentInterpretResponse, AgentInterpretStatus
-from app.services.calendar_read import get_calendar_events_response
+
+from ..calendar.read import get_calendar_events_response
 
 
 AGENT_OWNER = "agent"
@@ -34,6 +36,7 @@ def _extract_output_text(payload: dict[str, Any]) -> str:
 
 
 def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, Any]:
+    settings = get_settings()
     data = json.dumps(body).encode("utf-8")
     req = urllib_request.Request(
         OPENAI_RESPONSES_URL,
@@ -46,7 +49,10 @@ def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, A
     )
 
     try:
-        with urllib_request.urlopen(req, timeout=30) as response:
+        with urllib_request.urlopen(
+            req,
+            timeout=settings.openai_timeout_seconds,
+        ) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib_error.HTTPError as exc:
         raw = exc.read().decode("utf-8", errors="replace")
@@ -66,6 +72,18 @@ def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, A
         raise AppError(
             code="openai_request_failed",
             message=message,
+            status_code=502,
+        ) from exc
+    except TimeoutError as exc:
+        raise AppError(
+            code="openai_timeout",
+            message="OpenAI response timed out.",
+            status_code=502,
+        ) from exc
+    except socket.timeout as exc:
+        raise AppError(
+            code="openai_timeout",
+            message="OpenAI response timed out.",
             status_code=502,
         ) from exc
     except urllib_error.URLError as exc:

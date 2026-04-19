@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from app.services.slack_summary import get_slack_brief, summarize_slack_channel
+from app.services.integrations.slack_summary import (
+    get_slack_brief,
+    summarize_slack_channel,
+)
 
 
 def test_summarize_slack_channel_uses_mock_by_default() -> None:

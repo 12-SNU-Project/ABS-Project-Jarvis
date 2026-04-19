@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from app.services.admin import get_admin_summary
-from app.services.calendar import get_calendar_brief
-from app.services.presentation import get_presentation_demo
-from app.services.slack_summary import get_slack_brief
-from app.services.weather import get_weather_brief
 from app.schemas.schemas import FinalBriefing
+
+from ..calendar import get_calendar_brief
+from ..integrations.slack_summary import get_slack_brief
+from ..integrations.weather import get_weather_brief
+from ..support.admin import get_admin_summary
+from ..support.presentation import get_presentation_demo
 
 
 def create_briefing(user_input: str, location: str, date: str, user_name: str) -> FinalBriefing:
