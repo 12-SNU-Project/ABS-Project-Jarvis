@@ -1,0 +1,106 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/chatbot_avatar.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_body"]
+bg_color = Color(0.48, 0.82, 1, 0.25)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.48, 0.82, 1, 0.8)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+shadow_color = Color(0.48, 0.82, 1, 0.3)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eye"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_dots"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 85.0
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.05
+orbit_velocity_max = 0.15
+scale_min = 2.0
+scale_max = 4.0
+color = Color(0.48, 0.82, 1, 0.4)
+
+[sub_resource type="Curve" id="Curve_wave"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.5, 0.2), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_wave"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 72.0
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.8
+orbit_velocity_max = 1.2
+radial_accel_min = -20.0
+radial_accel_max = 20.0
+radial_accel_curve = SubResource("Curve_wave")
+scale_min = 3.0
+scale_max = 5.0
+color = Color(0.65, 0.9, 1, 0.8)
+
+[node name="ChatbotAvatar" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="GlowParticles" type="GPUParticles2D" parent="."]
+amount = 30
+process_material = SubResource("ParticleProcessMaterial_dots")
+lifetime = 4.0
+preprocess = 2.0
+
+[node name="WaveParticles" type="GPUParticles2D" parent="."]
+amount = 25
+process_material = SubResource("ParticleProcessMaterial_wave")
+lifetime = 1.5
+preprocess = 1.0
+
+[node name="Body" type="Panel" parent="."]
+custom_minimum_size = Vector2(140, 140)
+offset_left = -70.0
+offset_top = -70.0
+offset_right = 70.0
+offset_bottom = 70.0
+pivot_offset = Vector2(70, 70)
+theme_override_styles/panel = SubResource("StyleBoxFlat_body")
+
+[node name="Face" type="Node2D" parent="Body"]
+position = Vector2(70, 70)
+
+[node name="EyeLeft" type="Panel" parent="Body/Face"]
+offset_left = -32.0
+offset_top = -15.0
+offset_right = -12.0
+offset_bottom = 5.0
+pivot_offset = Vector2(10, 10)
+theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
+
+[node name="EyeRight" type="Panel" parent="Body/Face"]
+offset_left = 12.0
+offset_top = -15.0
+offset_right = 32.0
+offset_bottom = 5.0
+pivot_offset = Vector2(10, 10)
+theme_override_styles/panel = SubResource("StyleBoxFlat_eye")
+
+[node name="Mouth" type="Panel" parent="Body/Face"]
+offset_left = -15.0
+offset_top = 18.0
+offset_right = 15.0
+offset_bottom = 24.0
+pivot_offset = Vector2(15, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_eye")

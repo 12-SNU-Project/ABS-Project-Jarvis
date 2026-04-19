@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Jarvis Client"
-run/main_scene="uid://c7xq2k2xjqkq4"
+run/main_scene="res://scenes/core/main_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [display]
