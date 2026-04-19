@@ -6,7 +6,9 @@ extends Control
 
 @onready var avatar        = $TopZone/Avatar
 @onready var chat_bubble   = $UI/ChatBubble
+@onready var dock_panel    = $UI/Dock
 @onready var card_anchor   = $UI/CardAnchor
+@onready var weather_panel = $UI/CardAnchor/WeatherPanel
 @onready var slack_panel   = $UI/CardAnchor/SlackPanel
 @onready var calendar_panel= $UI/CardAnchor/CalendarPanel
 
@@ -25,14 +27,26 @@ func _ready():
 	btn_calendar.pressed.connect(func(): _open_panel("calendar"))
 	btn_slack.pressed.connect(func(): _open_panel("slack"))
 	btn_admin.pressed.connect(func(): _open_panel("admin"))
+	get_viewport().size_changed.connect(_fit_card_anchor_to_dock)
 
 	card_anchor.gui_input.connect(_on_card_anchor_input)
 	card_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
+	weather_panel.weather_loaded.connect(_on_weather_loaded)
 	slack_panel.summary_loaded.connect(_on_slack_loaded)
 
 	await get_tree().process_frame
+	_fit_card_anchor_to_dock()
 	chat_bubble.set_text("AI: 안녕하세요! 무엇을 도와드릴까요?", 5.0)
+
+
+func _fit_card_anchor_to_dock() -> void:
+	var viewport_height: float = get_viewport_rect().size.y
+	var dock_top: float = viewport_height + dock_panel.offset_bottom
+	card_anchor.anchor_top = 0.0
+	card_anchor.anchor_bottom = 1.0
+	card_anchor.offset_top = max(dock_top, 0.0)
+	card_anchor.offset_bottom = 0.0
 
 # ─── Panel Orchestration ──────────────────────────────────────────────────────
 func _open_panel(feature: String):
@@ -85,8 +99,10 @@ func _open_panel(feature: String):
 			chat_bubble.set_text("AI: 날짜를 선택하고 일정을 확인해보세요!", 5.0)
 			avatar.react_speaking()
 		"weather":
-			chat_bubble.set_text("AI: 오늘 서울은 맑고 17°C 입니다. ☀", 5.0)
-			avatar.react_speaking()
+			active_panel = weather_panel
+			card_anchor.mouse_filter = Control.MOUSE_FILTER_STOP
+			weather_panel.show_card()
+			avatar.react_card_open()
 		"admin":
 			chat_bubble.set_text("AI: 모든 서비스가 정상 작동 중입니다. ✓", 5.0)
 			avatar.react_speaking()
@@ -106,3 +122,11 @@ func _on_slack_loaded(channel: String, count: int):
 	avatar.react_speaking()
 	chat_bubble.set_text("AI: %s 채널 메시지 %d개를 요약했어요! 👍" % [channel, count], 6.0)
 	avatar.set_mood_happy()
+
+
+func _on_weather_loaded(condition: String, temperature_c: float, summary: String, location: String):
+	avatar.react_weather(condition)
+	chat_bubble.set_text(
+		"AI: %s 현재 %.0f°C. %s" % [location, temperature_c, summary],
+		6.0
+	)

@@ -8,6 +8,7 @@ const BASE_URL       = "http://localhost:8000/api/v1"
 const CALENDARS_URL  = BASE_URL + "/calendars"
 const PROPOSALS_URL  = BASE_URL + "/calendar-operations/proposals"
 const SUMMARY_SUFFIX = "/summary"
+const MIN_CONTENT_HEIGHT := 560.0
 
 @onready var http_req     = $HTTPRequest
 @onready var date_edit    = $Margin/VBox/QueryRow/DateEdit
@@ -21,12 +22,53 @@ const SUMMARY_SUFFIX = "/summary"
 var _pending_action = ""   # "summary" or "events"
 
 func _ready():
+	_install_outer_scroll(MIN_CONTENT_HEIGHT)
 	modulate.a = 0.0
 	visible = false
 	http_req.request_completed.connect(_on_request_completed)
 	fetch_btn.pressed.connect(_on_fetch_pressed)
+	resized.connect(_fit_content_bounds)
 	# Set today's date
 	date_edit.text = Time.get_date_string_from_system()
+	call_deferred("_fit_content_bounds")
+
+
+func _install_outer_scroll(minimum_content_height: float) -> void:
+	var margin := $Margin
+	var root: Control = $Margin/VBox
+	root.custom_minimum_size.y = minimum_content_height
+
+	if root.get_parent() is ScrollContainer:
+		return
+
+	margin.remove_child(root)
+
+	var scroll := ScrollContainer.new()
+	scroll.name = "OuterScroll"
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.follow_focus = true
+	margin.add_child(scroll)
+	scroll.add_child(root)
+
+
+func _fit_content_bounds() -> void:
+	var outer_scroll := get_node_or_null("Margin/OuterScroll") as ScrollContainer
+	if outer_scroll == null or outer_scroll.get_child_count() == 0:
+		return
+
+	var root := outer_scroll.get_child(0) as Control
+	if root == null:
+		return
+
+	var target_width := outer_scroll.size.x
+	if target_width <= 0.0:
+		target_width = size.x - 64.0
+	if target_width <= 0.0:
+		return
+
+	root.custom_minimum_size = Vector2(target_width, max(root.custom_minimum_size.y, MIN_CONTENT_HEIGHT))
+	root.size = Vector2(target_width, max(outer_scroll.size.y, MIN_CONTENT_HEIGHT))
 
 # ─── State helpers ───────────────────────────────────────────────────────────
 func _set_state(s: State, msg: String = ""):
@@ -119,10 +161,15 @@ func show_card():
 	await get_tree().process_frame
 	await get_tree().process_frame
 
+	var outer_scroll := get_node_or_null("Margin/OuterScroll")
+	if outer_scroll and outer_scroll is ScrollContainer:
+		outer_scroll.scroll_vertical = 0
+
 	var panel_size = _get_panel_size()
 	custom_minimum_size = panel_size
 	size = panel_size
 	position = Vector2(0.0, panel_size.y)
+	_fit_content_bounds()
 
 	var tw = create_tween().set_parallel(true)
 	tw.set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
