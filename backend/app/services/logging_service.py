@@ -5,32 +5,44 @@ from .sqlite import get_db_connection, init_db
 from typing import Optional, List, Dict
 
 
-def log_feature_run(run_id: str, feature: str, owner: str, status: str, uses_mock: bool, latency_ms: int, prompt_tokens: int, completion_tokens: int, total_tokens: int):
+def log_feature_run(
+    run_id: str,
+    feature: str,
+    owner: str,
+    status: str,
+    used_llm: bool,
+    latency_ms: int,
+    prompt_tokens: int | None,
+    completion_tokens: int | None,
+    total_tokens: int | None,
+):
     """
     feature_runs 테이블에 실행 로그를 저장. DB/타입/입력값 오류 발생 시 print로 에러 로깅.
+    used_llm: LLM 사용 여부 (True/False)
+    토큰 관련 필드는 LLM 미사용 시 None/NULL로 저장
     """
     conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            '''INSERT INTO feature_runs (run_id, feature, owner, status, uses_mock, latency_ms, prompt_tokens, completion_tokens, total_tokens)
+            '''INSERT INTO feature_runs (run_id, feature, owner, status, used_llm, latency_ms, prompt_tokens, completion_tokens, total_tokens)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
             (
                 run_id,
                 feature,
                 owner,
                 status,
-                int(uses_mock),
+                int(used_llm),
                 int(latency_ms),
-                int(prompt_tokens),
-                int(completion_tokens),
-                int(total_tokens),
+                prompt_tokens if prompt_tokens is not None else None,
+                completion_tokens if completion_tokens is not None else None,
+                total_tokens if total_tokens is not None else None,
             )
         )
         conn.commit()
     except Exception as e:
-        print(f"[log_feature_run] Error logging feature run: {e}\nparams: run_id={run_id}, feature={feature}, owner={owner}, status={status}, uses_mock={uses_mock}, latency_ms={latency_ms}, prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
+        print(f"[log_feature_run] Error logging feature run: {e}\nparams: run_id={run_id}, feature={feature}, owner={owner}, status={status}, used_llm={used_llm}, latency_ms={latency_ms}, prompt_tokens={prompt_tokens}, completion_tokens={completion_tokens}, total_tokens={total_tokens}")
     finally:
         if conn:
             try:
