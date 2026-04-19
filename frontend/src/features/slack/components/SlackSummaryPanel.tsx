@@ -41,16 +41,19 @@ export function SlackSummaryPanel() {
     <section className="slack-panel">
       <header className="slack-panel__header">
         <div>
-          <div className="feature-card__badge">Slack Feature</div>
-          <h2>Slack Summary Demo</h2>
+          <div className="section-kicker">
+            <span>Live</span>
+            <span>Slack module</span>
+          </div>
+          <h3>Slack conversation digest</h3>
           <p>
-            버튼형 구조에서 바로 데모할 수 있도록, 채널 ID를 입력하고 실시간으로 Slack
-            요약 결과를 확인하는 화면입니다.
+            채널, 조회 기간, 프롬프트를 조정하면서 실제 요약 응답과 원문을 같은 화면에서
+            검토할 수 있습니다. 데모가 아니라 운영 검수용 패널처럼 읽히도록 구성했습니다.
           </p>
         </div>
         <div className="slack-panel__pill">
           <Radio size={16} style={{ marginRight: 8, verticalAlign: "text-bottom" }} />
-          FastAPI REST Endpoint Connected
+          FastAPI endpoint connected
         </div>
       </header>
 
@@ -103,7 +106,7 @@ export function SlackSummaryPanel() {
         </div>
 
         <button className="slack-form__submit" type="submit" disabled={isLoading}>
-          {isLoading ? "요약 생성 중..." : "Slack 요약 불러오기"}
+          {isLoading ? "요약 생성 중..." : "요약 불러오기"}
         </button>
       </form>
 
@@ -111,15 +114,15 @@ export function SlackSummaryPanel() {
 
       <div className="slack-grid">
         <section className="slack-card">
-          <div className="feature-card__badge">
+          <div className="section-kicker">
             <Sparkles size={14} style={{ marginRight: 6, verticalAlign: "text-bottom" }} />
-            Summary
+            <span>Summary</span>
           </div>
 
           {isLoading ? (
             <div className="slack-empty">
               <LoaderCircle size={18} style={{ marginRight: 8, verticalAlign: "text-bottom" }} />
-              Slack 대화를 읽고 5줄 요약을 생성하고 있습니다.
+              Slack 대화를 읽고 핵심 흐름을 정리하고 있습니다.
             </div>
           ) : data ? (
             <>
@@ -141,16 +144,16 @@ export function SlackSummaryPanel() {
             </>
           ) : (
             <div className="slack-empty">
-              Slack 버튼을 눌렀을 때 보여줄 데모 패널입니다. 위 입력값으로 실제 API를 호출해
-              요약 결과를 확인할 수 있습니다.
+              입력값을 조정한 뒤 요청을 실행하면, 요약 결과와 메타데이터가 이 카드에
+              정리됩니다.
             </div>
           )}
         </section>
 
         <section className="slack-card">
-          <div className="feature-card__badge">
+          <div className="section-kicker">
             <MessagesSquare size={14} style={{ marginRight: 6, verticalAlign: "text-bottom" }} />
-            Raw Messages
+            <span>Raw messages</span>
           </div>
 
           {data?.messages.length ? (
@@ -164,7 +167,8 @@ export function SlackSummaryPanel() {
             </ul>
           ) : (
             <div className="slack-empty">
-              아직 불러온 메시지가 없습니다. 요청을 실행하면 최근 대화 원문이 여기에 표시됩니다.
+              아직 불러온 메시지가 없습니다. 요청을 실행하면 최근 원문이 이 영역에
+              정리됩니다.
             </div>
           )}
         </section>

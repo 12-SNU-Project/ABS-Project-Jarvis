@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '../../../lib/config';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,11 +7,11 @@ const api = axios.create({
 
 export const briefingApi = {
   getBriefing: async (params: { user_input: string; location: string; date: string; user_name: string }) => {
-    const response = await api.post('/api/v1/briefings', params);
+    const response = await api.post('/briefings', params);
     return response.data;
   },
   getHealth: async () => {
-    const response = await api.get('/api/v1/health');
+    const response = await api.get('/health');
     return response.data;
   },
 };
