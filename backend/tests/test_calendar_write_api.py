@@ -14,6 +14,10 @@ def _event_by_id(state: dict, event_id: str) -> dict:
     return next(event for event in state["events"] if event["id"] == event_id)
 
 
+def _audit_record_by_proposal_id(state: dict, proposal_id: str) -> dict:
+    return next(record for record in state["audit_records"] if record["proposal_id"] == proposal_id)
+
+
 def _propose_operation(client, payload: dict) -> dict:
     response = client.post("/api/v1/calendar-operations/proposals", json=payload)
     assert response.status_code == 201, response.json()
@@ -149,6 +153,105 @@ def test_recurring_move_following_shifts_later_occurrences_by_delta(client) -> N
         after_state,
         "evt-series-3",
     )["start"]
+
+
+def test_recurring_move_following_proposal_before_state_contains_all_affected_events(client) -> None:
+    before_state = _load_state()
+    before_events = {
+        event_id: deepcopy(_event_by_id(before_state, event_id))
+        for event_id in ("evt-series-2", "evt-series-3")
+    }
+    shifted_start = (
+        datetime.fromisoformat(before_events["evt-series-2"]["start"]) + timedelta(minutes=45)
+    ).isoformat()
+
+    proposal = _propose_operation(
+        client,
+        {
+            "operation_type": "move_event",
+            "calendar_id": "primary",
+            "event_id": "evt-series-2",
+            "recurring_scope": "following",
+            "actor": "agent",
+            "event": {
+                "start": shifted_start,
+            },
+        },
+    )
+
+    before_ids = [event["id"] for event in proposal["before_state"]["events"]]
+    after_ids = [event["id"] for event in proposal["after_state"]["events"]]
+
+    assert before_ids == ["evt-series-2", "evt-series-3"]
+    assert after_ids == ["evt-series-2", "evt-series-3"]
+    for event_id, before_event in before_events.items():
+        assert _event_by_id({"events": proposal["before_state"]["events"]}, event_id) == before_event
+
+
+def test_recurring_move_execute_audit_before_state_contains_all_affected_events(client) -> None:
+    scopes_to_expected_ids = {
+        "following": ("evt-series-2", "evt-series-3"),
+        "series": ("evt-series-1", "evt-series-2", "evt-series-3"),
+    }
+
+    for scope, expected_ids in scopes_to_expected_ids.items():
+        before_state = _load_state()
+        before_events = {
+            event_id: deepcopy(_event_by_id(before_state, event_id)) for event_id in expected_ids
+        }
+        shifted_start = (
+            datetime.fromisoformat(before_events["evt-series-2"]["start"]) + timedelta(minutes=30)
+        ).isoformat()
+
+        proposal = _propose_operation(
+            client,
+            {
+                "operation_type": "move_event",
+                "calendar_id": "primary",
+                "event_id": "evt-series-2",
+                "recurring_scope": scope,
+                "actor": "agent",
+                "event": {
+                    "start": shifted_start,
+                },
+            },
+        )
+
+        response = _execute_operation(client, proposal)
+
+        assert response.status_code == 200
+        audit_record = _audit_record_by_proposal_id(_load_state(), proposal["proposal_id"])
+        before_ids = [event["id"] for event in audit_record["before_state"]["events"]]
+        after_ids = [event["id"] for event in audit_record["after_state"]["events"]]
+        assert before_ids == list(expected_ids)
+        assert after_ids == list(expected_ids)
+        for event_id, before_event in before_events.items():
+            assert _event_by_id({"events": audit_record["before_state"]["events"]}, event_id) == before_event
+
+
+def test_recurring_move_occurrence_proposal_before_state_contains_only_anchor_event(client) -> None:
+    before_state = _load_state()
+    anchor_before = deepcopy(_event_by_id(before_state, "evt-series-2"))
+    shifted_start = (
+        datetime.fromisoformat(anchor_before["start"]) + timedelta(minutes=20)
+    ).isoformat()
+
+    proposal = _propose_operation(
+        client,
+        {
+            "operation_type": "move_event",
+            "calendar_id": "primary",
+            "event_id": "evt-series-2",
+            "recurring_scope": "occurrence",
+            "actor": "agent",
+            "event": {
+                "start": shifted_start,
+            },
+        },
+    )
+
+    assert [event["id"] for event in proposal["before_state"]["events"]] == ["evt-series-2"]
+    assert proposal["before_state"]["events"][0] == anchor_before
 
 
 def test_execute_retry_after_success_returns_success_without_duplicate_audit_entries(client) -> None:

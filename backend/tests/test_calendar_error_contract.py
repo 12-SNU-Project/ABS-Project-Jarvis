@@ -109,12 +109,24 @@ def test_execute_with_confirmed_false_returns_422_with_error_envelope(client) ->
         },
     )
 
+    details = response.json()["error"]["details"]
+    assert details
+    assert details[0]["field"] == "confirmed"
+    assert details[0]["code"] == "confirmation_required"
+    assert details[0]["message"] == "confirmed must be true to execute an operation."
+
     _assert_error_envelope(
         response,
         status_code=422,
         code="confirmation_required",
         message="confirmed must be true to execute an operation.",
-        details=[],
+        details=[
+            {
+                "field": "confirmed",
+                "message": "confirmed must be true to execute an operation.",
+                "code": "confirmation_required",
+            }
+        ],
     )
 
 

@@ -115,6 +115,32 @@ def normalize_request_payload(request_payload: dict[str, Any]) -> dict[str, Any]
     return normalized
 
 
+def recurring_move_before_events(
+    state: dict[str, Any],
+    calendar_id: str,
+    event_id: str,
+    recurring_scope: str | None,
+) -> list[dict[str, Any]]:
+    target_event = get_event(state, calendar_id, event_id)
+    if not target_event.get("recurring") or recurring_scope not in {"following", "series"}:
+        return [target_event]
+
+    series_id = target_event.get("series_id")
+    if not series_id:
+        return [target_event]
+
+    target_start = parse_datetime(target_event["start"])
+    affected_events: list[dict[str, Any]] = []
+    for event in state["events"]:
+        if event["calendar_id"] != calendar_id or event.get("series_id") != series_id:
+            continue
+        if recurring_scope == "following" and parse_datetime(event["start"]) < target_start:
+            continue
+        affected_events.append(get_event(state, calendar_id, event["id"]))
+
+    return affected_events or [target_event]
+
+
 def preview_operation(
     state: dict[str, Any],
     request_payload: dict[str, Any],
@@ -148,7 +174,12 @@ def preview_operation(
         return {"events": [before_event]}, {"events": updated_events}, preview_state
 
     if operation_type == "move_event":
-        before_event = get_event(preview_state, calendar_id, event_id)
+        before_events = recurring_move_before_events(
+            preview_state,
+            calendar_id,
+            event_id,
+            recurring_scope,
+        )
         moved_events = move_event(
             preview_state,
             calendar_id,
@@ -156,7 +187,7 @@ def preview_operation(
             validate_event_payload(event_payload),
             recurring_scope,
         )
-        return {"events": [before_event]}, {"events": moved_events}, preview_state
+        return {"events": before_events}, {"events": moved_events}, preview_state
 
     if operation_type == "delete_event":
         before_event = get_event(preview_state, calendar_id, event_id)
@@ -206,7 +237,12 @@ def apply_operation(
         return {"events": before_events}, {"events": updated_events}
 
     if operation_type == "move_event":
-        before_events = [get_event(state, calendar_id, event_id)]
+        before_events = recurring_move_before_events(
+            state,
+            calendar_id,
+            event_id,
+            recurring_scope,
+        )
         moved_events = move_event(
             state,
             calendar_id,

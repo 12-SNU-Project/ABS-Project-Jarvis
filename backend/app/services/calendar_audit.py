@@ -3,7 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from app.core.errors import AppError
+from app.core.errors import AppError, error_detail
 from app.providers.calendar_provider import (
     append_audit_record,
     get_proposal,
@@ -80,6 +80,13 @@ def execute_calendar_operation(proposal_id: str, snapshot_hash: str, confirmed: 
             code="confirmation_required",
             message="confirmed must be true to execute an operation.",
             status_code=422,
+            details=[
+                error_detail(
+                    code="confirmation_required",
+                    message="confirmed must be true to execute an operation.",
+                    field="confirmed",
+                )
+            ],
         )
 
     state = load_calendar_state()
