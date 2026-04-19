@@ -27,6 +27,8 @@ from app.schemas.schemas import (
     FinalBriefing,
     HealthResponse,
     PresentationDemo,
+    SlackSummaryRequest,
+    SlackSummaryResponse,
 )
 from app.services.admin import get_admin_summary
 from app.services.agent_interpreter import interpret_agent_instruction
@@ -44,6 +46,7 @@ from app.services.calendar import (
     reject_calendar_operation,
 )
 from app.services.orchestrator import create_briefing
+from app.services.slack_summary import summarize_slack_channel
 from app.services.presentation import get_presentation_demo
 
 
@@ -318,6 +321,42 @@ def admin_summary() -> AdminSummary:
 )
 def presentation_demo() -> PresentationDemo:
     return get_presentation_demo()
+
+
+@router.post(
+    "/slack/summary",
+    response_model=SlackSummaryResponse,
+    tags=["slack"],
+)
+def slack_summary(payload: SlackSummaryRequest) -> SlackSummaryResponse:
+    settings = get_settings()
+    try:
+        return summarize_slack_channel(
+            channel_id=payload.channel_id,
+            user_input=payload.user_input,
+            date=payload.date or settings.default_date,
+            lookback_hours=payload.lookback_hours,
+        )
+    except ValueError as exc:
+        raise AppError(
+            code="invalid_query",
+            message=str(exc),
+            status_code=400,
+            details=[
+                error_detail(
+                    code="invalid_query",
+                    message=str(exc),
+                    field="lookback_hours",
+                )
+            ],
+        ) from exc
+    except RuntimeError as exc:
+        raise AppError(
+            code="slack_summary_failed",
+            message=str(exc),
+            status_code=502,
+            details=[],
+        ) from exc
 
 
 @router.get(

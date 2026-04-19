@@ -54,6 +54,9 @@ class Settings:
     calendar_state_path: str = os.path.join(gettempdir(), "jarvis-calendar-state.json")
     openai_api_key: str = ""
     openai_model: str = "gpt-5.4-mini"
+    slack_bot_token: str = ""
+    slack_channel_id: str = ""
+    slack_lookback_hours: int = 24
 
 
 def get_settings() -> Settings:
@@ -70,4 +73,7 @@ def get_settings() -> Settings:
         ),
         openai_api_key=os.getenv("OPENAI_API_KEY", ""),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-5.4-mini"),
+        slack_bot_token=os.getenv("SLACK_BOT_TOKEN", ""),
+        slack_channel_id=os.getenv("SLACK_CHANNEL_ID", ""),
+        slack_lookback_hours=int(os.getenv("SLACK_LOOKBACK_HOURS", "24")),
     )
