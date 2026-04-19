@@ -48,6 +48,8 @@ from app.services.calendar import (
 from app.services.orchestrator import create_briefing
 from app.services.slack_summary import summarize_slack_channel
 from app.services.presentation import get_presentation_demo
+from app.services.samsung_health import get_samsung_health_summary
+from app.schemas.schemas import SamsungHealthSummary
 
 
 router = APIRouter(prefix="/api/v1")
@@ -278,8 +280,16 @@ EndDateQuery = Annotated[
 def health_check() -> HealthResponse:
     settings = get_settings()
     return HealthResponse(
-        status="ok", use_mocks=settings.use_mocks, model=settings.openai_model
+        status="ok",
+        use_mocks=settings.use_mocks,
+        samsung_health_use_mock=settings.samsung_health_use_mock,
+        model=settings.openai_model,
     )
+
+
+@router.get("/health/sleep", response_model=SamsungHealthSummary, tags=["system"])
+def samsung_health_sleep() -> SamsungHealthSummary:
+    return SamsungHealthSummary(**get_samsung_health_summary())
 
 
 @router.post("/briefings", response_model=FinalBriefing, tags=["briefings"])

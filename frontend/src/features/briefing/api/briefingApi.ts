@@ -11,6 +11,10 @@ export const briefingApi = {
     const response = await api.post('/api/v1/briefings', params);
     return response.data;
   },
+  getSamsungHealth: async () => {
+    const response = await api.get('/health/sleep');
+    return response.data;
+  },
   getHealth: async () => {
     const response = await api.get('/api/v1/health');
     return response.data;

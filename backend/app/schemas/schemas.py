@@ -21,6 +21,9 @@ class HealthResponse(BaseModel):
     use_mocks: bool = Field(
         description="Whether the backend is currently serving mock integrations."
     )
+    samsung_health_use_mock: bool = Field(
+        description="Whether the Samsung Health integration is currently serving mock data."
+    )
     model: str = Field(
         description="Configured primary LLM model identifier.",
         examples=["gpt-5.1-mini"],
@@ -836,6 +839,16 @@ class PresentationDemo(FeatureResponse):
     cards: list[PresentationCard]
     closing_message: str
 
+class SamsungHealthSummary(BaseModel):
+    source: str
+    uses_mock: bool = True
+    detected_at: str
+    wake_time: Optional[str] = None
+    sleep_start: Optional[str] = None
+    sleep_end: Optional[str] = None
+    sleep_duration_minutes: Optional[int] = None
+    status: str
+    summary: str
 
 class BriefingRequest(BaseModel):
     user_input: str = Field(default="오늘 아침 브리핑 해줘")
