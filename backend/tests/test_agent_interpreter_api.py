@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 
+from app.services.assistant.interpreter import _build_system_prompt
+
 
 def test_agent_interpret_requires_openai_api_key(client, monkeypatch) -> None:
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
@@ -80,3 +82,21 @@ def test_agent_interpret_normalizes_natural_language_command(
         "command": "move event evt-3 to 2026-04-18 from 15:30 to 16:30 calendar primary",
         "explanation": "Matched 기획리뷰 to evt-3 and shifted it by 30 minutes.",
     }
+
+
+def test_agent_interpreter_prompt_defaults_general_schedule_questions() -> None:
+    prompt = _build_system_prompt(
+        selected_date="2026-04-18",
+        calendar_id="primary",
+        latest_proposal_id=None,
+        events=[],
+    )
+
+    assert (
+        'interpret that as "show schedule for 2026-04-18 calendar primary"'
+        in prompt
+    )
+    assert "Never ask the user to specify a calendar" in prompt
+    assert "default to a 60 minute duration" in prompt
+    assert 'If the phrase is generic, use "Meeting"' in prompt
+    assert "Never invent a meeting start time" in prompt

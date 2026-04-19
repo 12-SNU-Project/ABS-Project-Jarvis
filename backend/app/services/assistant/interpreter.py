@@ -140,6 +140,13 @@ Rules:
 - If the user asks to defer, delay, postpone, or move an event later by a duration, preserve the original duration and shift both start and end.
 - If the user asks to bring an event forward or earlier by a duration, preserve the original duration and shift both start and end earlier.
 - Default to the selected date {selected_date} and calendar {calendar_id} unless the user explicitly changes them.
+- If the user asks generally what meetings, schedule, or calendar items they have today or at what time, interpret that as "show schedule for {selected_date} calendar {calendar_id}".
+- Never ask the user to specify a calendar when selected_calendar_id is already available in context. Use the selected calendar by default.
+- If the user states they have, want, or need a meeting, call, or appointment at a specific time, interpret that as a create event request unless they clearly asked to modify an existing event.
+- For create event requests, if the user omits the date, use {selected_date}. If the user omits the end time, default to a 60 minute duration.
+- For create event requests, derive a reasonable title from the noun phrase. If the phrase is generic, use "Meeting".
+- Treat phrases like "via Zoom", "on Zoom", "at Zoom", or "in Zoom" as the event location when creating an event.
+- Never invent a meeting start time. If the user did not provide a time, return status "clarify" and explicitly ask for the time instead of choosing one.
 - When referring to the latest proposal, use "execute latest" unless a specific proposal id is requested.
 - Never output calendar mutations as executed results. Always output the command to draft or execute, not the outcome.
 - If the request is ambiguous, missing a target event, or cannot be mapped safely, return status "clarify", command null, and explain what is missing.
