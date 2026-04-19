@@ -242,6 +242,9 @@ def _mock_weather(location: str, date: str) -> dict:
 
 
 def _real_weather(location: str, date: str) -> dict:
+    import time
+    from .logging_service import log_feature_run
+    start_time = time.time()
     label, latitude, longitude = _resolve_location(location)
     nx, ny = _to_kma_grid(latitude, longitude)
     now = datetime.now(KST)
@@ -309,6 +312,20 @@ def _real_weather(location: str, date: str) -> dict:
     summary = (
         f"{label} 기준 현재 {round(temperature)}°C, 체감 {round(apparent)}°C입니다. "
         f"{label_text}이고 낮 최고 {round(max_temp)}°C / 최저 {round(min_temp)}°C 예상입니다. {rain_text}"
+    )
+
+    # 로그 DB 적재
+    end_time = time.time()
+    log_feature_run(
+        run_id=f"weather-{int(start_time)}",
+        feature="weather",
+        owner="조수빈",
+        status="success",
+        used_llm=False,
+        latency_ms=int((end_time - start_time) * 1000),
+        prompt_tokens=None,
+        completion_tokens=None,
+        total_tokens=None,
     )
 
     return {
