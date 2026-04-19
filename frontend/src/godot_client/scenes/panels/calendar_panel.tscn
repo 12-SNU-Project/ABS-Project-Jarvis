@@ -1,0 +1,207 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/panels/calendar_panel.gd" id="1_cal"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.98, 0.99, 1.0, 1)
+corner_radius_top_left = 32
+corner_radius_top_right = 32
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+shadow_color = Color(0.35, 0.52, 0.75, 0.15)
+shadow_size = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+content_margin_left = 14.0
+content_margin_top = 4.0
+content_margin_right = 14.0
+content_margin_bottom = 4.0
+bg_color = Color(0.88, 0.94, 1.0, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.95, 0.97, 1.0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.88, 1.0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.25, 0.55, 0.95, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.85, 0.9, 1.0, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="CalendarPanel" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_cal")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleRow" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="TitleBadge" type="Label" parent="Margin/VBox/TitleRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.22, 0.45, 0.82, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_badge")
+text = "📅  Calendar"
+
+[node name="Spacer" type="Control" parent="Margin/VBox/TitleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusLabel" type="Label" parent="Margin/VBox/TitleRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.7, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "● Syncing"
+
+[node name="QueryRow" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DateEdit" type="LineEdit" parent="Margin/VBox/QueryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+placeholder_text = "YYYY-MM-DD"
+
+[node name="CalIdEdit" type="LineEdit" parent="Margin/VBox/QueryRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "primary"
+
+[node name="FetchBtn" type="Button" parent="Margin/VBox/QueryRow"]
+custom_minimum_size = Vector2(100, 38)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "일정 조회"
+
+[node name="MainContent" type="VBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="SummarySection" type="VBoxContainer" parent="Margin/VBox/MainContent"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.0
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="Margin/VBox/MainContent/SummarySection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Day Summary"
+
+[node name="SummaryBox" type="PanelContainer" parent="Margin/VBox/MainContent/SummarySection"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="SummaryScroll" type="ScrollContainer" parent="Margin/VBox/MainContent/SummarySection/SummaryBox"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="SummaryLabel" type="Label" parent="Margin/VBox/MainContent/SummarySection/SummaryBox/SummaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.2, 0.28, 0.45, 1)
+theme_override_font_sizes/font_size = 14
+text = "날짜를 선택하고 조회 버튼을 눌러주세요."
+autowrap_mode = 2
+
+[node name="EventsSection" type="VBoxContainer" parent="Margin/VBox/MainContent"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="Margin/VBox/MainContent/EventsSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.5, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "Event Timeline"
+
+[node name="EventsBox" type="PanelContainer" parent="Margin/VBox/MainContent/EventsSection"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+
+[node name="EventsScroll" type="ScrollContainer" parent="Margin/VBox/MainContent/EventsSection/EventsBox"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="EventsList" type="VBoxContainer" parent="Margin/VBox/MainContent/EventsSection/EventsBox/EventsScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="StatusBanner" type="Label" parent="Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.4, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "Error state"
+autowrap_mode = 2
+
+[node name="ConflictBanner" type="PanelContainer" parent="Margin/VBox"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+
+[node name="ConflictLabel" type="Label" parent="Margin/VBox/ConflictBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.6, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "⚠ 일정 충돌 주의"

@@ -1,0 +1,306 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/chatbot_avatar.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_shadow"]
+bg_color = Color(0.05, 0.09, 0.16, 0.14)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_head"]
+bg_color = Color(0.12549, 0.160784, 0.235294, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.521569, 0.854902, 1, 0.9)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0.364706, 0.772549, 1, 0.18)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_metal"]
+bg_color = Color(0.152941, 0.219608, 0.313726, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.631373, 0.815686, 0.55)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_visor"]
+bg_color = Color(0.0470588, 0.113725, 0.192157, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.490196, 0.92549, 1, 0.42)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_led"]
+bg_color = Color(0.486275, 0.941176, 1, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+shadow_color = Color(0.486275, 0.941176, 1, 0.45)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_brow"]
+bg_color = Color(0.776471, 0.94902, 1, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mouth_frame"]
+bg_color = Color(0.0745098, 0.129412, 0.203922, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.447059, 0.870588, 1, 0.28)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_core"]
+bg_color = Color(0.486275, 0.941176, 1, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+shadow_color = Color(0.486275, 0.941176, 1, 0.4)
+shadow_size = 16
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_sparks"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 132.0
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.06
+orbit_velocity_max = 0.16
+scale_min = 1.4
+scale_max = 3.6
+color = Color(0.513726, 0.894118, 1, 0.32)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_orbit"]
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 88.0
+gravity = Vector3(0, 0, 0)
+orbit_velocity_min = 0.7
+orbit_velocity_max = 1.2
+radial_accel_min = -10.0
+radial_accel_max = 10.0
+scale_min = 2.2
+scale_max = 5.2
+color = Color(0.6, 0.952941, 1, 0.72)
+
+[node name="ChatbotAvatar" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="BackParticles" type="GPUParticles2D" parent="."]
+amount = 38
+process_material = SubResource("ParticleProcessMaterial_sparks")
+lifetime = 4.0
+preprocess = 1.4
+
+[node name="OrbitParticles" type="GPUParticles2D" parent="."]
+amount = 26
+process_material = SubResource("ParticleProcessMaterial_orbit")
+lifetime = 1.8
+preprocess = 1.1
+
+[node name="Robot" type="Node2D" parent="."]
+
+[node name="Shadow" type="Panel" parent="Robot"]
+offset_left = -84.0
+offset_top = 118.0
+offset_right = 84.0
+offset_bottom = 146.0
+pivot_offset = Vector2(84, 14)
+theme_override_styles/panel = SubResource("StyleBoxFlat_shadow")
+
+[node name="AntennaStem" type="Panel" parent="Robot"]
+offset_left = -4.0
+offset_top = -150.0
+offset_right = 4.0
+offset_bottom = -108.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="AntennaTip" type="Panel" parent="Robot"]
+offset_left = -13.0
+offset_top = -170.0
+offset_right = 13.0
+offset_bottom = -144.0
+pivot_offset = Vector2(13, 13)
+theme_override_styles/panel = SubResource("StyleBoxFlat_core")
+
+[node name="Neck" type="Panel" parent="Robot"]
+offset_left = -18.0
+offset_top = -8.0
+offset_right = 18.0
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="Torso" type="Panel" parent="Robot"]
+offset_left = -58.0
+offset_top = 12.0
+offset_right = 58.0
+offset_bottom = 118.0
+pivot_offset = Vector2(58, 53)
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="ArmLeft" type="Panel" parent="Robot/Torso"]
+offset_left = -22.0
+offset_top = 20.0
+offset_right = 2.0
+offset_bottom = 80.0
+rotation = -0.12
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="ArmRight" type="Panel" parent="Robot/Torso"]
+offset_left = 114.0
+offset_top = 20.0
+offset_right = 138.0
+offset_bottom = 80.0
+rotation = 0.12
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="ChestPlate" type="Panel" parent="Robot/Torso"]
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 98.0
+offset_bottom = 86.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_visor")
+
+[node name="CorePulse" type="Panel" parent="Robot/Torso/ChestPlate"]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 48.0
+offset_bottom = 42.0
+pivot_offset = Vector2(16, 16)
+modulate = Color(0.486275, 0.941176, 1, 0.3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_core")
+
+[node name="Core" type="Panel" parent="Robot/Torso/ChestPlate"]
+offset_left = 20.0
+offset_top = 14.0
+offset_right = 44.0
+offset_bottom = 38.0
+pivot_offset = Vector2(12, 12)
+theme_override_styles/panel = SubResource("StyleBoxFlat_core")
+
+[node name="ChestLine" type="Panel" parent="Robot/Torso/ChestPlate"]
+offset_left = 18.0
+offset_top = 50.0
+offset_right = 62.0
+offset_bottom = 56.0
+pivot_offset = Vector2(22, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="Head" type="Panel" parent="Robot"]
+offset_left = -76.0
+offset_top = -132.0
+offset_right = 76.0
+offset_bottom = 0.0
+pivot_offset = Vector2(76, 66)
+theme_override_styles/panel = SubResource("StyleBoxFlat_head")
+
+[node name="EarLeft" type="Panel" parent="Robot/Head"]
+offset_left = -16.0
+offset_top = 28.0
+offset_right = 6.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="EarRight" type="Panel" parent="Robot/Head"]
+offset_left = 146.0
+offset_top = 28.0
+offset_right = 168.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="Visor" type="Panel" parent="Robot/Head"]
+offset_left = 16.0
+offset_top = 18.0
+offset_right = 136.0
+offset_bottom = 94.0
+pivot_offset = Vector2(60, 38)
+theme_override_styles/panel = SubResource("StyleBoxFlat_visor")
+
+[node name="BrowLeft" type="Panel" parent="Robot/Head/Visor"]
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 46.0
+offset_bottom = 20.0
+pivot_offset = Vector2(14, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="BrowRight" type="Panel" parent="Robot/Head/Visor"]
+offset_left = 74.0
+offset_top = 14.0
+offset_right = 102.0
+offset_bottom = 20.0
+pivot_offset = Vector2(14, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="EyeLeft" type="Panel" parent="Robot/Head/Visor"]
+offset_left = 16.0
+offset_top = 28.0
+offset_right = 48.0
+offset_bottom = 44.0
+pivot_offset = Vector2(16, 8)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="EyeRight" type="Panel" parent="Robot/Head/Visor"]
+offset_left = 72.0
+offset_top = 28.0
+offset_right = 104.0
+offset_bottom = 44.0
+pivot_offset = Vector2(16, 8)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="CheekLeft" type="Panel" parent="Robot/Head/Visor"]
+visible = false
+offset_left = 12.0
+offset_top = 52.0
+offset_right = 28.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="CheekRight" type="Panel" parent="Robot/Head/Visor"]
+visible = false
+offset_left = 92.0
+offset_top = 52.0
+offset_right = 108.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="MouthFrame" type="Panel" parent="Robot/Head/Visor"]
+offset_left = 30.0
+offset_top = 54.0
+offset_right = 90.0
+offset_bottom = 72.0
+pivot_offset = Vector2(30, 9)
+theme_override_styles/panel = SubResource("StyleBoxFlat_mouth_frame")
+
+[node name="MouthBar" type="Panel" parent="Robot/Head/Visor/MouthFrame"]
+offset_left = 9.0
+offset_top = 6.0
+offset_right = 51.0
+offset_bottom = 12.0
+pivot_offset = Vector2(21, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")

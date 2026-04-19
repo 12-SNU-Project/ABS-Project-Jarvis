@@ -252,6 +252,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+frontend/src/godot_client/addons
 
 # sqlite database files
 *.db

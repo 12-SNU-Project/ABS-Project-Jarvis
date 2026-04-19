@@ -1,0 +1,305 @@
+[gd_scene load_steps=7 format=3 uid="uid://dgv4ljx77j4mx"]
+
+[ext_resource type="Script" path="res://scripts/panels/slack_panel.gd" id="1_slack"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.0470588, 0.0745098, 0.117647, 0.985)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.262745, 0.509804, 0.737255, 0.34)
+corner_radius_top_left = 34
+corner_radius_top_right = 34
+shadow_color = Color(0.0196078, 0.0352941, 0.0627451, 0.35)
+shadow_size = 22
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.0745098, 0.105882, 0.164706, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.388235, 0.682353, 0.933333, 0.16)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_input"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(0.0901961, 0.141176, 0.215686, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.372549, 0.643137, 0.882353, 0.28)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.262745, 0.592157, 0.980392, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status"]
+content_margin_left = 14.0
+content_margin_top = 6.0
+content_margin_right = 14.0
+content_margin_bottom = 6.0
+bg_color = Color(0.0901961, 0.141176, 0.215686, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[node name="SlackPanel" type="PanelContainer" unique_id=2083036700]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_slack")
+
+[node name="HTTPRequest" type="HTTPRequest" parent="." unique_id=1825769872]
+
+[node name="HTTPRequestHealth" type="HTTPRequest" parent="." unique_id=1563566622]
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 18
+
+[node name="Root" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TopRow" type="HBoxContainer" parent="Margin/Root"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Margin/Root/TopRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.941176, 0.980392, 1, 1)
+theme_override_font_sizes/font_size = 30
+text = "Slack Relay Board"
+
+[node name="Spacer" type="Control" parent="Margin/Root/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StatusPill" type="Label" parent="Margin/Root/TopRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.501961, 0.901961, 1, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_status")
+text = "●  READY"
+
+[node name="Body" type="HBoxContainer" parent="Margin/Root"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="LeftColumn" type="VBoxContainer" parent="Margin/Root/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.84
+
+[node name="SummaryCard" type="PanelContainer" parent="Margin/Root/Body/LeftColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="SummaryMargin" type="MarginContainer" parent="Margin/Root/Body/LeftColumn/SummaryCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 18
+
+[node name="SummaryVBox" type="VBoxContainer" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="SummaryHeader" type="HBoxContainer" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox"]
+layout_mode = 2
+
+[node name="SummaryTitle" type="Label" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox/SummaryHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.862745, 0.988235, 0.86)
+theme_override_font_sizes/font_size = 12
+text = "SUMMARY DECK"
+
+[node name="SummarySpacer" type="Control" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox/SummaryHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SummaryMeta" type="Label" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox/SummaryHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.752941, 0.87451, 0.62)
+theme_override_font_sizes/font_size = 11
+text = "preview"
+
+[node name="SummaryScroll" type="ScrollContainer" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="SummaryList" type="VBoxContainer" parent="Margin/Root/Body/LeftColumn/SummaryCard/SummaryMargin/SummaryVBox/SummaryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="RightColumn" type="VBoxContainer" parent="Margin/Root/Body"]
+custom_minimum_size = Vector2(430, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 1.24
+theme_override_constants/separation = 14
+
+[node name="ControlCard" type="PanelContainer" parent="Margin/Root/Body/RightColumn"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="ControlMargin" type="MarginContainer" parent="Margin/Root/Body/RightColumn/ControlCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="ControlVBox" type="VBoxContainer" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="FormGrid" type="GridContainer" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 6
+columns = 6
+
+[node name="ChannelTag" type="Label" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.878431, 1, 0.7)
+theme_override_font_sizes/font_size = 10
+text = "Channel"
+
+[node name="ChannelEdit" type="LineEdit" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+custom_minimum_size = Vector2(86, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92549, 0.976471, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "Code"
+max_length = 10
+
+[node name="DateTag" type="Label" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.878431, 1, 0.7)
+theme_override_font_sizes/font_size = 10
+text = "Date"
+
+[node name="DateEdit" type="LineEdit" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+custom_minimum_size = Vector2(126, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.92549, 0.976471, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "2026-04-19"
+
+[node name="LookbackTag" type="Label" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.878431, 1, 0.7)
+theme_override_font_sizes/font_size = 10
+text = "Lookback"
+
+[node name="HoursSpin" type="SpinBox" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox/FormGrid"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+value = 24.0
+suffix = "h"
+
+[node name="PromptEdit" type="TextEdit" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox"]
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92549, 0.976471, 1, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_input")
+text = "최근 대화 핵심 요약"
+wrap_mode = 1
+
+[node name="SubmitBtn" type="Button" parent="Margin/Root/Body/RightColumn/ControlCard/ControlMargin/ControlVBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "팀 신호 불러오기"
+
+[node name="FeedCard" type="PanelContainer" parent="Margin/Root/Body/RightColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 2.35
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="FeedMargin" type="MarginContainer" parent="Margin/Root/Body/RightColumn/FeedCard"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 18
+
+[node name="FeedVBox" type="VBoxContainer" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="FeedHeader" type="HBoxContainer" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox"]
+layout_mode = 2
+
+[node name="FeedTitle" type="Label" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox/FeedHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.862745, 0.988235, 0.86)
+theme_override_font_sizes/font_size = 12
+text = "RAW MESSAGE FEED"
+
+[node name="FeedSpacer" type="Control" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox/FeedHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CountLabel" type="Label" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox/FeedHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.603922, 0.752941, 0.87451, 0.62)
+theme_override_font_sizes/font_size = 11
+text = "preview"
+
+[node name="FeedScroll" type="ScrollContainer" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="MessageList" type="VBoxContainer" parent="Margin/Root/Body/RightColumn/FeedCard/FeedMargin/FeedVBox/FeedScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="StatusBanner" type="Label" parent="Margin/Root"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.698039, 0.658824, 1)
+theme_override_font_sizes/font_size = 12
+text = "Error state"
+autowrap_mode = 2
