@@ -8,11 +8,11 @@ const api = axios.create({
 
 export const briefingApi = {
   getBriefing: async (params: { user_input: string; location: string; date: string; user_name: string }) => {
-    const response = await api.post('/briefing', params);
+    const response = await api.post('/api/v1/briefings', params);
     return response.data;
   },
   getHealth: async () => {
-    const response = await api.get('/health');
+    const response = await api.get('/api/v1/health');
     return response.data;
   },
 };
