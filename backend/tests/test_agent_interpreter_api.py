@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 
 
-def test_agent_interpret_requires_openai_api_key(client, monkeypatch) -> None:
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+def test_agent_interpret_requires_openrouter_api_key(client, monkeypatch) -> None:
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
 
     response = client.post(
         "/api/v1/agent/interpret",
@@ -19,7 +19,7 @@ def test_agent_interpret_requires_openai_api_key(client, monkeypatch) -> None:
     assert response.json() == {
         "error": {
             "code": "openai_not_configured",
-            "message": "OPENAI_API_KEY is not configured for the backend agent interpreter.",
+            "message": "OPENROUTER_API_KEY is not configured for the backend agent interpreter.",
             "details": [],
         }
     }
@@ -28,12 +28,14 @@ def test_agent_interpret_requires_openai_api_key(client, monkeypatch) -> None:
 def test_agent_interpret_normalizes_natural_language_command(
     client, monkeypatch
 ) -> None:
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
 
-    def fake_post_openai_responses(body, *, api_key: str):
+    def fake_post_openrouter_responses(body, *, api_key: str, site_url: str, site_name: str):
         assert api_key == "test-key"
-        assert body["model"] == "gpt-5.4-mini"
+        assert body["model"] == "openrouter/elephant-alpha"
         assert body["text"]["format"]["type"] == "json_object"
+        assert site_url == ""
+        assert site_name == ""
 
         return {
             "output": [
@@ -57,8 +59,8 @@ def test_agent_interpret_normalizes_natural_language_command(
         }
 
     monkeypatch.setattr(
-        "app.services.agent_interpreter._post_openai_responses",
-        fake_post_openai_responses,
+        "app.services.agent_interpreter._post_openrouter_responses",
+        fake_post_openrouter_responses,
     )
 
     response = client.post(
@@ -76,7 +78,7 @@ def test_agent_interpret_normalizes_natural_language_command(
         "feature": "agent_interpreter",
         "uses_mock": True,
         "status": "interpreted",
-        "source": "openai",
+        "source": "openrouter",
         "command": "move event evt-3 to 2026-04-18 from 15:30 to 16:30 calendar primary",
         "explanation": "Matched 기획리뷰 to evt-3 and shifted it by 30 minutes.",
     }

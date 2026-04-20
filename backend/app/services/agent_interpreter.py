@@ -13,7 +13,7 @@ from app.services.calendar_read import get_calendar_events_response
 
 AGENT_OWNER = "agent"
 AGENT_FEATURE = "agent_interpreter"
-OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+OPENROUTER_RESPONSES_URL = "https://openrouter.ai/api/v1/responses"
 
 
 def _extract_output_text(payload: dict[str, Any]) -> str:
@@ -33,16 +33,27 @@ def _extract_output_text(payload: dict[str, Any]) -> str:
     return "".join(collected).strip()
 
 
-def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, Any]:
+def _post_openrouter_responses(
+    body: dict[str, Any],
+    *,
+    api_key: str,
+    site_url: str,
+    site_name: str,
+) -> dict[str, Any]:
     data = json.dumps(body).encode("utf-8")
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    if site_url:
+        headers["HTTP-Referer"] = site_url
+    if site_name:
+        headers["X-OpenRouter-Title"] = site_name
     req = urllib_request.Request(
-        OPENAI_RESPONSES_URL,
+        OPENROUTER_RESPONSES_URL,
         data=data,
         method="POST",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
+        headers=headers,
     )
 
     try:
@@ -50,7 +61,7 @@ def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, A
             return json.loads(response.read().decode("utf-8"))
     except urllib_error.HTTPError as exc:
         raw = exc.read().decode("utf-8", errors="replace")
-        message = "OpenAI request failed."
+        message = "OpenRouter request failed."
         try:
             payload = json.loads(raw)
         except json.JSONDecodeError:
@@ -71,7 +82,7 @@ def _post_openai_responses(body: dict[str, Any], *, api_key: str) -> dict[str, A
     except urllib_error.URLError as exc:
         raise AppError(
             code="openai_unreachable",
-            message="Could not reach the OpenAI API.",
+            message="Could not reach the OpenRouter API.",
             status_code=502,
         ) from exc
 
@@ -142,10 +153,10 @@ def interpret_agent_instruction(
     latest_proposal_id: str | None = None,
 ) -> AgentInterpretResponse:
     settings = get_settings()
-    if not settings.openai_api_key:
+    if not settings.openrouter_api_key:
         raise AppError(
             code="openai_not_configured",
-            message="OPENAI_API_KEY is not configured for the backend agent interpreter.",
+            message="OPENROUTER_API_KEY is not configured for the backend agent interpreter.",
             status_code=503,
         )
 
@@ -165,7 +176,7 @@ def interpret_agent_instruction(
     ]
 
     payload = {
-        "model": settings.openai_model,
+        "model": settings.openrouter_model,
         "input": [
             {
                 "role": "system",
@@ -180,12 +191,17 @@ def interpret_agent_instruction(
         ],
         "text": {"format": {"type": "json_object"}},
     }
-    response_payload = _post_openai_responses(payload, api_key=settings.openai_api_key)
+    response_payload = _post_openrouter_responses(
+        payload,
+        api_key=settings.openrouter_api_key,
+        site_url=settings.openrouter_site_url,
+        site_name=settings.openrouter_site_name,
+    )
     output_text = _extract_output_text(response_payload)
     if not output_text:
         raise AppError(
             code="openai_empty_response",
-            message="OpenAI returned an empty command interpretation.",
+            message="OpenRouter returned an empty command interpretation.",
             status_code=502,
         )
 
@@ -194,7 +210,7 @@ def interpret_agent_instruction(
     except json.JSONDecodeError as exc:
         raise AppError(
             code="openai_invalid_response",
-            message="OpenAI returned invalid JSON for the command interpretation.",
+            message="OpenRouter returned invalid JSON for the command interpretation.",
             status_code=502,
         ) from exc
 
@@ -208,7 +224,7 @@ def interpret_agent_instruction(
     }:
         raise AppError(
             code="openai_invalid_response",
-            message="OpenAI returned an unsupported interpretation status.",
+            message="OpenRouter returned an unsupported interpretation status.",
             status_code=502,
         )
 
@@ -216,7 +232,7 @@ def interpret_agent_instruction(
         if not isinstance(command, str) or not command.strip():
             raise AppError(
                 code="openai_invalid_response",
-                message="OpenAI did not provide a normalized command.",
+                message="OpenRouter did not provide a normalized command.",
                 status_code=502,
             )
         command = command.strip()
@@ -228,7 +244,7 @@ def interpret_agent_instruction(
         feature=AGENT_FEATURE,
         uses_mock=settings.use_mocks,
         status=AgentInterpretStatus(status),
-        source="openai",
+        source="openrouter",
         command=command,
         explanation=explanation or "The instruction requires clarification.",
     )

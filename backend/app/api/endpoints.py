@@ -224,19 +224,19 @@ PROPOSAL_CONFLICT_RESPONSE = _error_response(
 AGENT_INTERPRET_ERROR_RESPONSE = _error_response(
     "The natural-language instruction could not be interpreted.",
     openai_not_configured=_error_example(
-        "OpenAI not configured",
+        "OpenRouter not configured",
         code="openai_not_configured",
-        message="OPENAI_API_KEY is not configured for the backend agent interpreter.",
+        message="OPENROUTER_API_KEY is not configured for the backend agent interpreter.",
     ),
     openai_request_failed=_error_example(
-        "OpenAI request failed",
+        "OpenRouter request failed",
         code="openai_request_failed",
-        message="The OpenAI API rejected the request.",
+        message="The OpenRouter API rejected the request.",
     ),
     openai_invalid_response=_error_example(
-        "OpenAI invalid response",
+        "OpenRouter invalid response",
         code="openai_invalid_response",
-        message="OpenAI returned invalid JSON for the command interpretation.",
+        message="OpenRouter returned invalid JSON for the command interpretation.",
     ),
 )
 
@@ -284,7 +284,7 @@ def health_check() -> HealthResponse:
         status="ok",
         use_mocks=settings.use_mocks,
         samsung_health_use_mock=settings.samsung_health_use_mock,
-        model=settings.openai_model,
+        model=settings.openrouter_model,
     )
 
 

@@ -52,8 +52,10 @@ class Settings:
     default_timezone: str = "Asia/Seoul"
     calendar_provider: str = "mock"
     calendar_state_path: str = os.path.join(gettempdir(), "jarvis-calendar-state.json")
-    openai_api_key: str = ""
-    openai_model: str = "gpt-5.4-mini"
+    openrouter_api_key: str = ""
+    openrouter_model: str = "openrouter/elephant-alpha"
+    openrouter_site_url: str = ""
+    openrouter_site_name: str = ""
     slack_bot_token: str = ""
     slack_channel_id: str = ""
     slack_lookback_hours: int = 24
@@ -76,8 +78,10 @@ def get_settings() -> Settings:
             "JARVIS_CALENDAR_STATE_PATH",
             os.path.join(gettempdir(), "jarvis-calendar-state.json"),
         ),
-        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
-        openai_model=os.getenv("OPENAI_MODEL", "gpt-5.4-mini"),
+        openrouter_api_key=os.getenv("OPENROUTER_API_KEY", ""),
+        openrouter_model=os.getenv("OPENROUTER_MODEL", "openrouter/elephant-alpha"),
+        openrouter_site_url=os.getenv("OPENROUTER_SITE_URL", ""),
+        openrouter_site_name=os.getenv("OPENROUTER_SITE_NAME", ""),
         slack_bot_token=os.getenv("SLACK_BOT_TOKEN", ""),
         slack_channel_id=os.getenv("SLACK_CHANNEL_ID", ""),
         slack_lookback_hours=int(os.getenv("SLACK_LOOKBACK_HOURS", "24")),

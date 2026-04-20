@@ -738,7 +738,7 @@ class AgentInterpretResponse(FeatureResponse):
                     "feature": "agent_interpreter",
                     "uses_mock": True,
                     "status": "interpreted",
-                    "source": "openai",
+                    "source": "openrouter",
                     "command": "move event evt-3 to 2026-04-18 from 15:30 to 16:30 calendar primary",
                     "explanation": "Matched '기획리뷰' to evt-3 and shifted the meeting by 30 minutes.",
                 }
@@ -751,7 +751,7 @@ class AgentInterpretResponse(FeatureResponse):
     )
     source: str = Field(
         description="Interpreter source used to resolve the instruction.",
-        examples=["openai"],
+        examples=["openrouter"],
     )
     command: str | None = Field(
         default=None,

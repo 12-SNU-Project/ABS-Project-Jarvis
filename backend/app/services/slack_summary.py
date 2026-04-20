@@ -124,6 +124,8 @@ def _summarize_with_openai(
     lookback_hours: int,
     model: str,
     api_key: str,
+    site_url: str,
+    site_name: str,
 ) -> tuple[list[str], dict[str, int]]:
     if not messages:
         return [
@@ -137,7 +139,17 @@ def _summarize_with_openai(
     transcript = "\n".join(
         f"- {message['user']}: {message['text'][:500]}" for message in messages
     )
-    client = OpenAI(api_key=api_key)
+    default_headers = {}
+    if site_url:
+        default_headers["HTTP-Referer"] = site_url
+    if site_name:
+        default_headers["X-OpenRouter-Title"] = site_name
+
+    client = OpenAI(
+        api_key=api_key,
+        base_url="https://openrouter.ai/api/v1",
+        default_headers=default_headers or None,
+    )
     response = client.responses.create(
         model=model,
         input=[
@@ -186,8 +198,8 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
 
     if not settings.slack_bot_token:
         raise RuntimeError("SLACK_BOT_TOKEN is missing. Add it to .env and restart the server.")
-    if not settings.openai_api_key:
-        raise RuntimeError("OPENAI_API_KEY is missing. Add it to .env and restart the server.")
+    if not settings.openrouter_api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is missing. Add it to .env and restart the server.")
 
     client = WebClient(token=settings.slack_bot_token)
     try:
@@ -217,11 +229,13 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
             user_input=user_input,
             channel_name=channel_name,
             lookback_hours=lookback_hours,
-            model=settings.openai_model,
-            api_key=settings.openai_api_key,
+            model=settings.openrouter_model,
+            api_key=settings.openrouter_api_key,
+            site_url=settings.openrouter_site_url,
+            site_name=settings.openrouter_site_name,
         )
     except Exception as exc:
-        raise RuntimeError(f"OpenAI summarization failed: {exc}") from exc
+        raise RuntimeError(f"OpenRouter summarization failed: {exc}") from exc
     
     log_feature_run(
         run_id=f"slack_summary-{int(time.time())}",
@@ -246,7 +260,7 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
         "summary": "\n".join(summary_lines),
         "summary_lines": summary_lines,
         "messages": messages,
-        "model": settings.openai_model,
+        "model": settings.openrouter_model,
         "uses_mock": False,
     }
 

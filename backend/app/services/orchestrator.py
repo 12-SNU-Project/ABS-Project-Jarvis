@@ -13,6 +13,23 @@ from app.services.weather import get_weather_brief
 from app.schemas.schemas import FinalBriefing
 
 
+def _extract_response_text(response_data: dict) -> str:
+    output_text = str(response_data.get("output_text", "")).strip()
+    if output_text:
+        return output_text
+
+    collected: list[str] = []
+    for item in response_data.get("output", []):
+        if item.get("type") != "message":
+            continue
+        for content in item.get("content", []):
+            text = content.get("text")
+            if content.get("type") == "output_text" and isinstance(text, str) and text.strip():
+                collected.append(text.strip())
+
+    return "\n".join(collected).strip()
+
+
 def _build_fallback_summary(
     weather: dict,
     calendar: dict,
@@ -54,12 +71,12 @@ def _generate_final_summary(
     settings = get_settings()
     fallback_summary = _build_fallback_summary(weather, calendar, slack, admin, presentation)
 
-    if settings.use_mocks or not settings.openai_api_key:
+    if settings.use_mocks or not settings.openrouter_api_key:
         return fallback_summary
 
     try:
         payload = {
-            "model": settings.openai_model,
+            "model": settings.openrouter_model,
             "instructions": (
                 "당신은 개인 비서 Jarvis입니다. 제공된 데이터를 바탕으로 아침 브리핑 최종 요약을 한국어로 작성하세요. "
                 "3~5문장으로 간결하게 쓰고, 중요한 일정, 날씨, 슬랙 액션아이템, admin 상태, 발표 포인트를 자연스럽게 묶어 주세요."
@@ -77,17 +94,21 @@ def _generate_final_summary(
             ),
         }
         request = Request(
-            url="https://api.openai.com/v1/responses",
+            url="https://openrouter.ai/api/v1/responses",
             data=json.dumps(payload).encode("utf-8"),
             headers={
-                "Authorization": f"Bearer {settings.openai_api_key}",
+                "Authorization": f"Bearer {settings.openrouter_api_key}",
                 "Content-Type": "application/json",
             },
             method="POST",
         )
+        if settings.openrouter_site_url:
+            request.add_header("HTTP-Referer", settings.openrouter_site_url)
+        if settings.openrouter_site_name:
+            request.add_header("X-OpenRouter-Title", settings.openrouter_site_name)
         with urlopen(request, timeout=30) as response:
             response_data = json.loads(response.read().decode("utf-8"))
-        summary = str(response_data.get("output_text", "")).strip()
+        summary = _extract_response_text(response_data)
         return summary or fallback_summary
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError, OSError):
         return fallback_summary
