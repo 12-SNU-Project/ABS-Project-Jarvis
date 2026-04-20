@@ -1,0 +1,202 @@
+[gd_scene format=3 uid="uid://bcerphsxqulpa"]
+
+[ext_resource type="Script" uid="uid://c8nv2ecu4wxn6" path="res://scripts/components/chatbot_avatar.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_brow"]
+bg_color = Color(0.776471, 0.94902, 1, 0.95)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_core"]
+bg_color = Color(0.486275, 0.941176, 1, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+shadow_color = Color(0.486275, 0.941176, 1, 0.4)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_head"]
+bg_color = Color(0.12549, 0.160784, 0.235294, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.521569, 0.854902, 1, 0.9)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 32
+corner_radius_bottom_left = 32
+shadow_color = Color(0.364706, 0.772549, 1, 0.18)
+shadow_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_metal"]
+bg_color = Color(0.152941, 0.219608, 0.313726, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.431373, 0.631373, 0.815686, 0.55)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_visor"]
+bg_color = Color(0.0470588, 0.113725, 0.192157, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.490196, 0.92549, 1, 0.42)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_led"]
+bg_color = Color(0.486275, 0.941176, 1, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+shadow_color = Color(0.486275, 0.941176, 1, 0.45)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mouth_frame"]
+bg_color = Color(0.0745098, 0.129412, 0.203922, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.447059, 0.870588, 1, 0.28)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="ChatbotAvatar" type="Node2D" unique_id=474034315]
+script = ExtResource("1_script")
+
+[node name="Robot" type="Node2D" parent="." unique_id=1290385558]
+
+[node name="AntennaStem" type="Panel" parent="Robot" unique_id=707868498]
+offset_left = -4.0
+offset_top = -150.0
+offset_right = 4.0
+offset_bottom = -108.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="AntennaTip" type="Panel" parent="Robot" unique_id=182591809]
+offset_left = -13.0
+offset_top = -170.0
+offset_right = 13.0
+offset_bottom = -144.0
+pivot_offset = Vector2(13, 13)
+theme_override_styles/panel = SubResource("StyleBoxFlat_core")
+
+[node name="Head" type="Panel" parent="Robot" unique_id=1935382431]
+offset_left = -76.0
+offset_top = -132.0
+offset_right = 76.0
+pivot_offset = Vector2(76, 66)
+theme_override_styles/panel = SubResource("StyleBoxFlat_head")
+
+[node name="EarLeft" type="Panel" parent="Robot/Head" unique_id=1038966143]
+layout_mode = 0
+offset_left = -16.0
+offset_top = 28.0
+offset_right = 6.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="EarRight" type="Panel" parent="Robot/Head" unique_id=1395880821]
+layout_mode = 0
+offset_left = 146.0
+offset_top = 28.0
+offset_right = 168.0
+offset_bottom = 76.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_metal")
+
+[node name="Visor" type="Panel" parent="Robot/Head" unique_id=1881351125]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 18.0
+offset_right = 136.0
+offset_bottom = 94.0
+pivot_offset = Vector2(60, 38)
+theme_override_styles/panel = SubResource("StyleBoxFlat_visor")
+
+[node name="BrowLeft" type="Panel" parent="Robot/Head/Visor" unique_id=342359092]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 14.0
+offset_right = 46.0
+offset_bottom = 20.0
+pivot_offset = Vector2(14, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="BrowRight" type="Panel" parent="Robot/Head/Visor" unique_id=1133774758]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 14.0
+offset_right = 102.0
+offset_bottom = 20.0
+pivot_offset = Vector2(14, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_brow")
+
+[node name="EyeLeft" type="Panel" parent="Robot/Head/Visor" unique_id=1124795302]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 28.0
+offset_right = 48.0
+offset_bottom = 44.0
+pivot_offset = Vector2(16, 8)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="EyeRight" type="Panel" parent="Robot/Head/Visor" unique_id=826187216]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 28.0
+offset_right = 104.0
+offset_bottom = 44.0
+pivot_offset = Vector2(16, 8)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="CheekLeft" type="Panel" parent="Robot/Head/Visor" unique_id=1160528030]
+visible = false
+layout_mode = 0
+offset_left = 12.0
+offset_top = 52.0
+offset_right = 28.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="CheekRight" type="Panel" parent="Robot/Head/Visor" unique_id=1786951246]
+visible = false
+layout_mode = 0
+offset_left = 92.0
+offset_top = 52.0
+offset_right = 108.0
+offset_bottom = 60.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")
+
+[node name="MouthFrame" type="Panel" parent="Robot/Head/Visor" unique_id=192492851]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 54.0
+offset_right = 90.0
+offset_bottom = 72.0
+pivot_offset = Vector2(30, 9)
+theme_override_styles/panel = SubResource("StyleBoxFlat_mouth_frame")
+
+[node name="MouthBar" type="Panel" parent="Robot/Head/Visor/MouthFrame" unique_id=864126944]
+layout_mode = 0
+offset_left = 9.0
+offset_top = 6.0
+offset_right = 51.0
+offset_bottom = 12.0
+pivot_offset = Vector2(21, 3)
+theme_override_styles/panel = SubResource("StyleBoxFlat_led")

@@ -61,6 +61,11 @@ class Settings:
     slack_bot_token: str = ""
     slack_channel_id: str = ""
     slack_lookback_hours: int = 24
+    samsung_health_use_mock: bool = True
+    samsung_health_api_url: str = ""
+    samsung_health_api_key: str = ""
+    samsung_health_bridge_token: str = ""
+    samsung_health_state_path: str = os.path.join(gettempdir(), "jarvis-samsung-health-state.json")
 
 
 def get_settings() -> Settings:
@@ -86,4 +91,12 @@ def get_settings() -> Settings:
         slack_bot_token=os.getenv("SLACK_BOT_TOKEN", ""),
         slack_channel_id=os.getenv("SLACK_CHANNEL_ID", ""),
         slack_lookback_hours=int(os.getenv("SLACK_LOOKBACK_HOURS", "24")),
+        samsung_health_use_mock=_as_bool(os.getenv("SAMSUNG_HEALTH_USE_MOCK"), True),
+        samsung_health_api_url=os.getenv("SAMSUNG_HEALTH_API_URL", ""),
+        samsung_health_api_key=os.getenv("SAMSUNG_HEALTH_API_KEY", ""),
+        samsung_health_bridge_token=os.getenv("SAMSUNG_HEALTH_BRIDGE_TOKEN", ""),
+        samsung_health_state_path=os.getenv(
+            "SAMSUNG_HEALTH_STATE_PATH",
+            os.path.join(gettempdir(), "jarvis-samsung-health-state.json"),
+        ),
     )

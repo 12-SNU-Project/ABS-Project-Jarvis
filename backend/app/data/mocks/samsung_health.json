@@ -1,0 +1,13 @@
+{
+  "health_data_type": "com.samsung.health.sleep",
+  "detected_at": "2026-04-18T07:12:00+09:00",
+  "items": [
+    {
+      "start_time": 1776440880000,
+      "end_time": 1776467100000,
+      "time_offset": 32400000,
+      "comment": "Samsung Health sleep session imported from Android bridge."
+    }
+  ],
+  "status": "awake"
+}

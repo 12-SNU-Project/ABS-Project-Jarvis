@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import APIRouter, File, Path, Query, UploadFile, status
+from fastapi import APIRouter, File, Header, Path, Query, UploadFile, status
 
 from app.core.config import get_settings
 from app.core.errors import AppError, error_detail
@@ -27,6 +27,8 @@ from app.schemas.schemas import (
     FinalBriefing,
     HealthResponse,
     PresentationDemo,
+    SamsungHealthBridgePayload,
+    SamsungHealthSummary,
     SlackSummaryRequest,
     SlackSummaryResponse,
     StartupGreetingRequest,
@@ -52,6 +54,7 @@ from app.services.calendar import (
     reject_calendar_operation,
 )
 from app.services.integrations.slack_summary import summarize_slack_channel
+from app.services.samsung_health import get_samsung_health_summary, ingest_samsung_health_payload
 from app.services.support.admin import get_admin_summary
 from app.services.support.presentation import get_presentation_demo
 from app.voice.service import synthesize_speech, transcribe_audio
@@ -285,8 +288,39 @@ EndDateQuery = Annotated[
 def health_check() -> HealthResponse:
     settings = get_settings()
     return HealthResponse(
-        status="ok", use_mocks=settings.use_mocks, model=settings.openai_model
+        status="ok",
+        use_mocks=settings.use_mocks,
+        samsung_health_use_mock=settings.samsung_health_use_mock,
+        model=settings.openai_model,
     )
+
+
+@router.get("/health/sleep", response_model=SamsungHealthSummary, tags=["system"])
+def samsung_health_sleep() -> SamsungHealthSummary:
+    return SamsungHealthSummary(**get_samsung_health_summary())
+
+
+@router.post("/health/sleep/bridge", response_model=SamsungHealthSummary, tags=["system"])
+def samsung_health_sleep_bridge(
+    payload: SamsungHealthBridgePayload,
+    x_bridge_token: str | None = Header(default=None, alias="X-Bridge-Token"),
+) -> SamsungHealthSummary:
+    settings = get_settings()
+    if not settings.samsung_health_bridge_token:
+        raise AppError(
+            code="samsung_health_bridge_not_configured",
+            message="SAMSUNG_HEALTH_BRIDGE_TOKEN is not configured for bridge ingestion.",
+            status_code=503,
+            details=[],
+        )
+    if x_bridge_token != settings.samsung_health_bridge_token:
+        raise AppError(
+            code="invalid_bridge_token",
+            message="The Samsung Health bridge token is invalid.",
+            status_code=401,
+            details=[],
+        )
+    return SamsungHealthSummary(**ingest_samsung_health_payload(payload.model_dump()))
 
 
 @router.post("/briefings", response_model=FinalBriefing, tags=["briefings"])

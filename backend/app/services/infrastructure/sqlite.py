@@ -21,7 +21,7 @@ def init_db():
             feature TEXT,
             owner TEXT,
             status TEXT,
-            uses_mock INTEGER,
+            used_llm INTEGER,
             latency_ms INTEGER,
             prompt_tokens INTEGER,
             completion_tokens INTEGER,
