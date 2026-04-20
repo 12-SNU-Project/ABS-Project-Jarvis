@@ -5,6 +5,11 @@ __pycache__
 node_modules
 dist
 .DS_Store
+android-bridge/.idea/
+android-bridge/.gradle/
+android-bridge/local.properties
+android-bridge/app/libs/*.aar
+!android-bridge/app/libs/.gitkeep
 
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,python,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm,python,visualstudiocode

@@ -228,11 +228,11 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
         feature="slack_summary",
         owner="문이현",
         status="success",
-        uses_mock=False,
-        latency_ms=metrics.get("latency_sec", 0) * 1000,
-        prompt_tokens=metrics.get("input_tokens", 0),
-        completion_tokens=metrics.get("output_tokens", 0),
-        total_tokens=metrics.get("total_tokens", 0),
+        used_llm=True,
+        latency_ms=int(metrics.get("latency_sec", 0) * 1000),
+        prompt_tokens=metrics.get("input_tokens"),
+        completion_tokens=metrics.get("output_tokens"),
+        total_tokens=metrics.get("total_tokens"),
     )
     
     return {

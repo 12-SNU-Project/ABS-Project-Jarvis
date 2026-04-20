@@ -62,6 +62,28 @@ Professional, typed, and decoupled multi-agent system.
 ```
 ---
 
+## Samsung Health Integration
+
+현재 브랜치에는 Samsung Health 기반 수면/기상 입력 계층이 추가되어 있습니다.
+
+- Android 브리지 앱: `android-bridge/`
+- 백엔드 조회 API: `GET /api/v1/health/sleep`
+- 백엔드 업로드 API: `POST /api/v1/health/sleep/bridge`
+- 자동 동기화 초안: Android WorkManager 기반 wake-time auto sync
+
+상세 문서:
+
+- `docs/SAMSUNG_HEALTH_DEVICE_BRIDGE.md`
+- `docs/SAMSUNG_HEALTH_API.md`
+
+주의:
+
+- Samsung Health Data SDK AAR은 레포에 포함하지 않습니다.
+- 각 개발자가 직접 다운로드 후 `android-bridge/app/libs/` 에 넣어야 합니다.
+- 현재 검증은 Samsung Health 개발자 모드 기준입니다.
+
+---
+
 ## Teammate
 | 이름 | 역할 | GitHub |
 |--------|------|--------|
@@ -87,6 +109,15 @@ source .venv/bin/activate
 pip install -e .
 uvicorn main:app --reload
 ```
+
+### Android Bridge
+
+```bash
+cd android-bridge
+./gradlew assembleDebug
+```
+
+Android Studio에서 `android-bridge/` 를 열고 Samsung Health SDK AAR을 `app/libs/` 에 추가한 뒤 삼성폰으로 실행하면 됩니다.
 
 ---
 ### Branch Convention
