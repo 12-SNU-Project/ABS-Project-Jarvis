@@ -85,6 +85,20 @@ corner_radius_bottom_left = 24
 shadow_color = Color(0, 0, 0, 0.22)
 shadow_size = 16
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speech_bubble"]
+bg_color = Color(0.0705882, 0.101961, 0.168627, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.384314, 0.603922, 0.956863, 0.8)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 10
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar"]
 bg_color = Color(0.117647, 0.133333, 0.172549, 0.97)
 border_width_left = 1
@@ -134,20 +148,6 @@ corner_radius_top_left = 14
 corner_radius_top_right = 14
 corner_radius_bottom_right = 14
 corner_radius_bottom_left = 14
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speech_bubble"]
-bg_color = Color(0.0705882, 0.101961, 0.168627, 0.95)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.384314, 0.603922, 0.956863, 0.8)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.22)
-shadow_size = 10
 
 [node name="AvatarEmbedScene" type="Control" unique_id=994218498]
 layout_mode = 3
@@ -219,12 +219,14 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.788235, 0.831373, 0.921569, 1)
 theme_override_font_sizes/font_size = 17
 text = "JARVIS DESKTOP"
+horizontal_alignment = 1
 
 [node name="NavSubLabel" type="Label" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox" unique_id=991564868]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.564706, 0.607843, 0.694118, 1)
 theme_override_font_sizes/font_size = 12
-text = "Primary navigation"
+text = "Mode navigation"
+horizontal_alignment = 1
 
 [node name="NavStack" type="Control" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox" unique_id=1566842414]
 custom_minimum_size = Vector2(0, 350)
@@ -262,7 +264,6 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
 toggle_mode = true
 button_pressed = true
 text = "Overview"
-alignment = 0
 
 [node name="NavAlerts" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=896577487]
 custom_minimum_size = Vector2(0, 56)
@@ -277,7 +278,6 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
 toggle_mode = true
 text = "Alerts"
-alignment = 0
 
 [node name="NavAgent" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=2030721576]
 custom_minimum_size = Vector2(0, 56)
@@ -292,7 +292,6 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
 toggle_mode = true
 text = "Agent"
-alignment = 0
 
 [node name="NavSystem" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=812142408]
 custom_minimum_size = Vector2(0, 56)
@@ -306,8 +305,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
 toggle_mode = true
-text = "System"
-alignment = 0
+text = "Admin"
 
 [node name="WorkspaceColumn" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow" unique_id=2064565440]
 layout_mode = 2
@@ -413,9 +411,10 @@ position = Vector2(340, 290)
 scale = Vector2(0.8, 0.8)
 
 [node name="SpeechBubble" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage" unique_id=1033678745]
-visible = false
-offset_right = 360.0
-offset_bottom = 100.0
+layout_mode = 0
+offset_top = 8.0
+offset_right = 352.0
+offset_bottom = 81.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_speech_bubble")
 
@@ -430,10 +429,10 @@ theme_override_constants/margin_bottom = 10
 custom_minimum_size = Vector2(320, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-autowrap_mode = 3
 theme_override_colors/font_color = Color(0.862745, 0.905882, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "Monitoring started."
+autowrap_mode = 3
 
 [node name="RightSidebar" type="PanelContainer" parent="MainLayout/RootVBox/TopRow" unique_id=1329904989]
 custom_minimum_size = Vector2(308, 0)
@@ -471,7 +470,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.839216, 0.866667, 0.941176, 1)
 theme_override_font_sizes/font_size = 18
-text = "Notifications"
+text = "Overview Feed"
 
 [node name="SidebarToggleButton" type="Button" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/SidebarHeader" unique_id=731033657]
 custom_minimum_size = Vector2(36, 32)
@@ -550,7 +549,7 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_colors/font_color = Color(0.886275, 0.905882, 0.956863, 1)
 theme_override_font_sizes/font_size = 15
-text = "Quick Info"
+text = "Overview Info"
 
 [node name="MiniInfoLine1" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin/MiniInfoVBox" unique_id=2001762764]
 layout_mode = 2
@@ -620,7 +619,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.713726, 0.752941, 0.85098, 1)
 theme_override_font_sizes/font_size = 14
-text = "Roaming active"
+text = "Overview mode active"
 vertical_alignment = 1
 
 [node name="TraySidebarToggleButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=890632975]
@@ -659,6 +658,15 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
 text = "Pause Monitor"
 
+[node name="TrayMicToggleButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=2147297518]
+custom_minimum_size = Vector2(118, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.886275, 0.956863, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_tray_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+text = "Start Voice"
+
 [node name="ClockLabel" type="Label" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=1478690462]
 custom_minimum_size = Vector2(64, 0)
 layout_mode = 2
@@ -678,10 +686,27 @@ autostart = true
 wait_time = 45.0
 autostart = true
 
+[node name="IdleBriefTimer" type="Timer" parent="." unique_id=772093941]
+wait_time = 180.0
+autostart = true
+
 [node name="BubbleTimer" type="Timer" parent="." unique_id=436272944]
-one_shot = true
 wait_time = 4.0
+one_shot = true
+
+[node name="WatchdogTickTimer" type="Timer" parent="." unique_id=940608801]
+autostart = true
+
+[node name="MicRecordTimer" type="Timer" parent="." unique_id=1101647476]
+wait_time = 7.0
+one_shot = true
 
 [node name="CalendarRequest" type="HTTPRequest" parent="." unique_id=1482383535]
 
 [node name="SlackRequest" type="HTTPRequest" parent="." unique_id=1850888099]
+
+[node name="IdleBriefRequest" type="HTTPRequest" parent="." unique_id=1637523804]
+
+[node name="SttRequest" type="HTTPRequest" parent="." unique_id=665382465]
+
+[node name="AgentInterpretRequest" type="HTTPRequest" parent="." unique_id=2079312090]
