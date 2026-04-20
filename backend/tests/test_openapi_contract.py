@@ -220,3 +220,28 @@ def test_openapi_agent_interpret_contract_is_documented(client) -> None:
     assert operation["responses"]["503"]["content"]["application/json"]["schema"]["$ref"] == (
         "#/components/schemas/ErrorResponse"
     )
+
+
+def test_openapi_stt_transcribe_contract_is_documented(client) -> None:
+    schema = _openapi_schema(client)
+    operation = schema["paths"]["/api/v1/stt/transcribe"]["post"]
+
+    assert operation["tags"] == ["voice"]
+    assert operation["requestBody"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/SttTranscribeRequest"
+    )
+    assert operation["responses"]["200"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/SttTranscribeResponse"
+    )
+    assert operation["responses"]["413"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert operation["responses"]["422"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert operation["responses"]["502"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )
+    assert operation["responses"]["503"]["content"]["application/json"]["schema"]["$ref"] == (
+        "#/components/schemas/ErrorResponse"
+    )

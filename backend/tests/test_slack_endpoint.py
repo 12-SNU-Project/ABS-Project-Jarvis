@@ -26,3 +26,22 @@ def test_slack_summary_endpoint_returns_mock_response() -> None:
     assert body["uses_mock"] is True
     assert body["lookback_hours"] == 24
     assert len(body["summary_lines"]) == 5
+
+
+def test_slack_activity_endpoint_returns_mock_response() -> None:
+    response = client.get(
+        "/api/v1/slack/activity",
+        params={
+            "channel_id": "C1234567890",
+            "date": "2026-04-18",
+            "lookback_hours": 24,
+        },
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["feature"] == "slack_activity"
+    assert body["channel_id"] == "C1234567890"
+    assert body["uses_mock"] is True
+    assert body["lookback_hours"] == 24
+    assert body["message_count"] >= 0
