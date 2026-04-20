@@ -27,8 +27,11 @@ from app.schemas.schemas import (
     FinalBriefing,
     HealthResponse,
     PresentationDemo,
+    SlackActivityResponse,
     SlackSummaryRequest,
     SlackSummaryResponse,
+    SttTranscribeRequest,
+    SttTranscribeResponse,
 )
 from app.services.admin import get_admin_summary
 from app.services.agent_interpreter import interpret_agent_instruction
@@ -46,7 +49,8 @@ from app.services.calendar import (
     reject_calendar_operation,
 )
 from app.services.orchestrator import create_briefing
-from app.services.slack_summary import summarize_slack_channel
+from app.services.slack_summary import get_slack_activity, summarize_slack_channel
+from app.services.stt import transcribe_audio
 from app.services.presentation import get_presentation_demo
 
 
@@ -236,6 +240,42 @@ AGENT_INTERPRET_ERROR_RESPONSE = _error_response(
         message="OpenAI returned invalid JSON for the command interpretation.",
     ),
 )
+STT_TRANSCRIBE_ERROR_RESPONSE = _error_response(
+    "Speech transcription request failed.",
+    invalid_audio_base64=_error_example(
+        "Invalid base64 audio",
+        code="invalid_audio_base64",
+        message="audio_base64 must be valid base64 data.",
+        field="audio_base64",
+    ),
+    empty_audio_payload=_error_example(
+        "Empty audio payload",
+        code="empty_audio_payload",
+        message="Decoded audio payload is empty.",
+        field="audio_base64",
+    ),
+    audio_payload_too_large=_error_example(
+        "Audio payload too large",
+        code="audio_payload_too_large",
+        message="Audio payload exceeds the 8MB limit.",
+        field="audio_base64",
+    ),
+    openai_not_configured=_error_example(
+        "OpenAI not configured",
+        code="openai_not_configured",
+        message="OPENAI_API_KEY is not configured for speech transcription.",
+    ),
+    openai_request_failed=_error_example(
+        "OpenAI transcription failed",
+        code="openai_request_failed",
+        message="OpenAI transcription request failed.",
+    ),
+    openai_empty_response=_error_example(
+        "OpenAI empty transcription",
+        code="openai_empty_response",
+        message="OpenAI returned an empty transcription.",
+    ),
+)
 
 
 CalendarId = Annotated[
@@ -311,6 +351,26 @@ def interpret_agent_route(payload: AgentInterpretRequest) -> AgentInterpretRespo
     )
 
 
+@router.post(
+    "/stt/transcribe",
+    response_model=SttTranscribeResponse,
+    tags=["voice"],
+    responses={
+        413: STT_TRANSCRIBE_ERROR_RESPONSE,
+        422: STT_TRANSCRIBE_ERROR_RESPONSE,
+        502: STT_TRANSCRIBE_ERROR_RESPONSE,
+        503: STT_TRANSCRIBE_ERROR_RESPONSE,
+    },
+)
+def transcribe_audio_route(payload: SttTranscribeRequest) -> SttTranscribeResponse:
+    return transcribe_audio(
+        audio_base64=payload.audio_base64,
+        mime_type=payload.mime_type,
+        language=payload.language,
+        prompt=payload.prompt,
+    )
+
+
 @router.get("/admin/summary", response_model=AdminSummary, tags=["admin"])
 def admin_summary() -> AdminSummary:
     return get_admin_summary()
@@ -353,6 +413,67 @@ def slack_summary(payload: SlackSummaryRequest) -> SlackSummaryResponse:
     except RuntimeError as exc:
         raise AppError(
             code="slack_summary_failed",
+            message=str(exc),
+            status_code=502,
+            details=[],
+        ) from exc
+
+
+@router.get(
+    "/slack/activity",
+    response_model=SlackActivityResponse,
+    tags=["slack"],
+)
+def slack_activity(
+    channel_id: Annotated[
+        str,
+        Query(
+            min_length=1,
+            description="Slack channel ID such as C0123456789.",
+            examples=["C0123456789"],
+        ),
+    ],
+    lookback_hours: Annotated[
+        int,
+        Query(
+            ge=1,
+            le=168,
+            description="How many hours of recent messages to inspect.",
+            examples=[24],
+        ),
+    ] = 24,
+    date_value: Annotated[
+        str | None,
+        Query(
+            alias="date",
+            description="Date label used for response context.",
+            examples=["2026-04-18"],
+        ),
+    ] = None,
+) -> SlackActivityResponse:
+    settings = get_settings()
+    try:
+        return get_slack_activity(
+            channel_id=channel_id,
+            date=date_value or settings.default_date,
+            lookback_hours=lookback_hours,
+        )
+    except ValueError as exc:
+        raise AppError(
+            code="invalid_query",
+            message=str(exc),
+            status_code=400,
+            details=[
+                error_detail(
+                    code="invalid_query",
+                    message=str(exc),
+                    field="lookback_hours",
+                )
+            ],
+        ) from exc
+    except RuntimeError as exc:
+        raise AppError(
+            code="slack_activity_failed",
             message=str(exc),
             status_code=502,
             details=[],

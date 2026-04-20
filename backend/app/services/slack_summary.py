@@ -251,6 +251,72 @@ def summarize_slack_channel(channel_id: str, user_input: str, date: str, lookbac
     }
 
 
+def get_slack_activity(channel_id: str, date: str, lookback_hours: int) -> dict[str, Any]:
+    settings = get_settings()
+    if lookback_hours < 1 or lookback_hours > 168:
+        raise ValueError("lookback_hours must be between 1 and 168.")
+
+    if settings.use_mocks:
+        mock_summary = _build_mock_summary(
+            user_input="activity-check",
+            date=date,
+            channel_id=channel_id,
+            lookback_hours=lookback_hours,
+        )
+        latest_message = mock_summary["messages"][-1] if mock_summary["messages"] else None
+        return {
+            "owner": "문이현",
+            "feature": "slack_activity",
+            "date": date,
+            "channel_id": channel_id,
+            "channel_name": mock_summary["channel_name"],
+            "lookback_hours": lookback_hours,
+            "message_count": mock_summary["message_count"],
+            "latest_message_ts": latest_message["ts"] if latest_message else None,
+            "latest_message_preview": latest_message["text"] if latest_message else None,
+            "uses_mock": True,
+        }
+
+    if not settings.slack_bot_token:
+        raise RuntimeError("SLACK_BOT_TOKEN is missing. Add it to .env and restart the server.")
+
+    client = WebClient(token=settings.slack_bot_token)
+    try:
+        channel_name = _fetch_channel_name(client, channel_id)
+        messages = _fetch_recent_messages(client, channel_id, lookback_hours)
+    except SlackApiError as exc:
+        error_message = exc.response.get("error", "unknown_slack_error")
+        if error_message == "not_in_channel":
+            raise RuntimeError(
+                "Slack bot is not in the channel. Invite the app to that channel with /invite @your-app-name and try again."
+            ) from exc
+        if error_message == "missing_scope":
+            raise RuntimeError(
+                "Slack app is missing required scopes. Add channels:read and channels:history, then reinstall the app."
+            ) from exc
+        if error_message == "invalid_auth":
+            raise RuntimeError(
+                "Slack bot token is invalid. Check SLACK_BOT_TOKEN in .env and reinstall the app if needed."
+            ) from exc
+        raise RuntimeError(f"Slack API request failed: {error_message}") from exc
+    except Exception as exc:
+        raise RuntimeError(f"Failed to read Slack messages: {exc}") from exc
+
+    latest_message = messages[-1] if messages else None
+    return {
+        "owner": "문이현",
+        "feature": "slack_activity",
+        "date": date,
+        "channel_id": channel_id,
+        "channel_name": channel_name,
+        "lookback_hours": lookback_hours,
+        "message_count": len(messages),
+        "latest_message_ts": latest_message["ts"] if latest_message else None,
+        "latest_message_preview": latest_message["text"] if latest_message else None,
+        "uses_mock": False,
+    }
+
+
 def get_slack_brief(user_input: str, date: str) -> dict:
     settings = get_settings()
     channel_id = settings.slack_channel_id or "mock-channel"

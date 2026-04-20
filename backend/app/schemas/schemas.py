@@ -759,6 +759,57 @@ class AgentInterpretResponse(FeatureResponse):
     )
 
 
+class SttTranscribeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    audio_base64: str = Field(
+        min_length=1,
+        description="Base64-encoded audio bytes from the client.",
+    )
+    mime_type: str = Field(
+        default="audio/wav",
+        description="MIME type for the encoded audio payload.",
+        examples=["audio/wav"],
+    )
+    language: str = Field(
+        default="ko",
+        description="BCP-47 style language hint for transcription.",
+        examples=["ko"],
+    )
+    prompt: str | None = Field(
+        default=None,
+        description="Optional prompt to bias domain terms or names.",
+    )
+
+
+class SttTranscribeResponse(FeatureResponse):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {
+                    "owner": "voice",
+                    "feature": "speech_to_text",
+                    "uses_mock": False,
+                    "source": "openai",
+                    "model": "gpt-4o-mini-transcribe",
+                    "language": "ko",
+                    "transcript": "오늘 오후 세 시 회의를 삼십 분 뒤로 옮겨줘.",
+                }
+            ]
+        }
+    )
+
+    source: str = Field(
+        description="Transcription provider used for this request.",
+        examples=["openai"],
+    )
+    model: str = Field(description="Model identifier used for transcription.")
+    language: str = Field(description="Language label associated with the transcript.")
+    transcript: str = Field(
+        description="Recognized text from the provided audio payload."
+    )
+
+
 class SlackChannelSummary(BaseModel):
     channel: str
     summary: str
@@ -796,6 +847,17 @@ class SlackSummaryResponse(FeatureResponse):
     summary_lines: list[str]
     messages: list[SlackMessage]
     model: str
+
+
+class SlackActivityResponse(FeatureResponse):
+    date: str
+    channel_id: str
+    channel_name: str
+    lookback_hours: int
+    message_count: int
+    latest_message_ts: str | None = None
+    latest_message_preview: str | None = None
+
 
 class AdminMetric(BaseModel):
     feature: str
