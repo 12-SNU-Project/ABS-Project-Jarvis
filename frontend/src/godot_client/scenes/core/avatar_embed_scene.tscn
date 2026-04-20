@@ -1,0 +1,687 @@
+[gd_scene format=3 uid="uid://bkvvibro3b8i2"]
+
+[ext_resource type="Script" uid="uid://btpiqveitat6m" path="res://scripts/core/avatar_embed_scene.gd" id="1_scene"]
+[ext_resource type="PackedScene" uid="uid://bcerphsxqulpa" path="res://scenes/components/chatbot_avatar.tscn" id="2_avatar"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav_shell"]
+bg_color = Color(0.129412, 0.145098, 0.188235, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.243137, 0.266667, 0.337255, 0.9)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav_indicator"]
+bg_color = Color(0.239216, 0.427451, 0.85098, 0.35)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav_button_normal"]
+bg_color = Color(0.145098, 0.164706, 0.219608, 0)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav_button_pressed"]
+bg_color = Color(0.239216, 0.427451, 0.85098, 0.28)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nav_button_hover"]
+bg_color = Color(0.215686, 0.247059, 0.345098, 0.56)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_header"]
+bg_color = Color(0.14902, 0.172549, 0.235294, 0.92)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.247059, 0.290196, 0.380392, 0.84)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.18)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_chip"]
+bg_color = Color(0.219608, 0.423529, 0.85098, 0.2)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.356863, 0.556863, 1, 0.92)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_arena"]
+bg_color = Color(0.0941176, 0.109804, 0.14902, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.223529, 0.258824, 0.337255, 0.8)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar"]
+bg_color = Color(0.117647, 0.133333, 0.172549, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.227451, 0.258824, 0.329412, 0.9)
+corner_radius_top_left = 22
+corner_radius_top_right = 22
+corner_radius_bottom_right = 22
+corner_radius_bottom_left = 22
+shadow_color = Color(0, 0, 0, 0.24)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
+bg_color = Color(0.160784, 0.180392, 0.239216, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.254902, 0.294118, 0.388235, 0.9)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tray"]
+bg_color = Color(0.0941176, 0.105882, 0.145098, 0.98)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.219608, 0.254902, 0.32549, 0.9)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tray_button"]
+bg_color = Color(0.192157, 0.227451, 0.309804, 0.85)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.313726, 0.376471, 0.501961, 0.95)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speech_bubble"]
+bg_color = Color(0.0705882, 0.101961, 0.168627, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.384314, 0.603922, 0.956863, 0.8)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.22)
+shadow_size = 10
+
+[node name="AvatarEmbedScene" type="Control" unique_id=994218498]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_scene")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=1178981905]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0705882, 0.0784314, 0.105882, 1)
+
+[node name="MainLayout" type="MarginContainer" parent="." unique_id=1675579024]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 18.0
+offset_top = 18.0
+offset_right = -18.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="RootVBox" type="VBoxContainer" parent="MainLayout" unique_id=1424471339]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="TopRow" type="HBoxContainer" parent="MainLayout/RootVBox" unique_id=976760473]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="LeftNav" type="PanelContainer" parent="MainLayout/RootVBox/TopRow" unique_id=67359357]
+custom_minimum_size = Vector2(188, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_nav_shell")
+
+[node name="NavMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/LeftNav" unique_id=351065547]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="NavVBox" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin" unique_id=267263292]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="AppLabel" type="Label" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox" unique_id=1222370026]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788235, 0.831373, 0.921569, 1)
+theme_override_font_sizes/font_size = 17
+text = "JARVIS DESKTOP"
+
+[node name="NavSubLabel" type="Label" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox" unique_id=991564868]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.564706, 0.607843, 0.694118, 1)
+theme_override_font_sizes/font_size = 12
+text = "Primary navigation"
+
+[node name="NavStack" type="Control" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox" unique_id=1566842414]
+custom_minimum_size = Vector2(0, 350)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="NavIndicator" type="Panel" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack" unique_id=1099618736]
+layout_mode = 0
+offset_right = 160.0
+offset_bottom = 56.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_nav_indicator")
+
+[node name="NavButtons" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack" unique_id=52437315]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="NavHome" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=795866654]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.776471, 0.870588, 1)
+theme_override_colors/font_focus_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_pressed_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_hover_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_nav_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
+toggle_mode = true
+button_pressed = true
+text = "Overview"
+alignment = 0
+
+[node name="NavAlerts" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=896577487]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.776471, 0.870588, 1)
+theme_override_colors/font_focus_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_pressed_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_hover_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_nav_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
+toggle_mode = true
+text = "Alerts"
+alignment = 0
+
+[node name="NavAgent" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=2030721576]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.776471, 0.870588, 1)
+theme_override_colors/font_focus_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_pressed_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_hover_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_nav_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
+toggle_mode = true
+text = "Agent"
+alignment = 0
+
+[node name="NavSystem" type="Button" parent="MainLayout/RootVBox/TopRow/LeftNav/NavMargin/NavVBox/NavStack/NavButtons" unique_id=812142408]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.741176, 0.776471, 0.870588, 1)
+theme_override_colors/font_focus_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_pressed_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_colors/font_hover_color = Color(0.917647, 0.929412, 0.972549, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_nav_button_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_nav_button_pressed")
+toggle_mode = true
+text = "System"
+alignment = 0
+
+[node name="WorkspaceColumn" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow" unique_id=2064565440]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="HeaderBar" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn" unique_id=1478118831]
+custom_minimum_size = Vector2(0, 86)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_header")
+
+[node name="HeaderMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar" unique_id=167831153]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="HeaderRow" type="HBoxContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin" unique_id=367499049]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="TitleColumn" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow" unique_id=435829415]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow/TitleColumn" unique_id=1341441975]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.905882, 0.921569, 0.980392, 1)
+theme_override_font_sizes/font_size = 26
+text = "Avatar Workspace"
+
+[node name="SubtitleLabel" type="Label" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow/TitleColumn" unique_id=1620064404]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.615686, 0.654902, 0.760784, 1)
+theme_override_font_sizes/font_size = 14
+text = "Autonomous roam enabled inside viewport"
+
+[node name="StatusChip" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow" unique_id=400521208]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_status_chip")
+
+[node name="StatusMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow/StatusChip" unique_id=1274711958]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 8
+
+[node name="StatusLabel" type="Label" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/HeaderBar/HeaderMargin/HeaderRow/StatusChip/StatusMargin" unique_id=900566283]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.839216, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "Agent Online"
+
+[node name="ArenaPanel" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn" unique_id=657603356]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_arena")
+
+[node name="ArenaStage" type="Control" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel" unique_id=367996967]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ArenaAmbient" type="ColorRect" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage" unique_id=1388882203]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.129412, 0.156863, 0.219608, 0.45)
+
+[node name="ArenaHint" type="Label" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage" unique_id=1674403923]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -34.0
+offset_right = -24.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.533333, 0.572549, 0.67451, 1)
+theme_override_font_sizes/font_size = 13
+text = "Avatar roams freely and shifts expression by context."
+horizontal_alignment = 1
+
+[node name="Avatar" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage" unique_id=1880932722 instance=ExtResource("2_avatar")]
+position = Vector2(340, 290)
+scale = Vector2(0.8, 0.8)
+
+[node name="SpeechBubble" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage" unique_id=1033678745]
+visible = false
+offset_right = 360.0
+offset_bottom = 100.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_speech_bubble")
+
+[node name="BubbleMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage/SpeechBubble" unique_id=897082922]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="SpeechLabel" type="Label" parent="MainLayout/RootVBox/TopRow/WorkspaceColumn/ArenaPanel/ArenaStage/SpeechBubble/BubbleMargin" unique_id=1891504266]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.862745, 0.905882, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Monitoring started."
+
+[node name="RightSidebar" type="PanelContainer" parent="MainLayout/RootVBox/TopRow" unique_id=1329904989]
+custom_minimum_size = Vector2(308, 0)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar")
+
+[node name="SidebarMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar" unique_id=177942230]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="SidebarStack" type="Control" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin" unique_id=1182273238]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="SidebarContent" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack" unique_id=130138441]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="SidebarHeader" type="HBoxContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1223446760]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SidebarTitle" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/SidebarHeader" unique_id=526221463]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.839216, 0.866667, 0.941176, 1)
+theme_override_font_sizes/font_size = 18
+text = "Notifications"
+
+[node name="SidebarToggleButton" type="Button" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/SidebarHeader" unique_id=731033657]
+custom_minimum_size = Vector2(36, 32)
+layout_mode = 2
+text = "<<"
+
+[node name="AlertCard1" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=430927196]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="AlertCard1Margin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard1" unique_id=1379031597]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="AlertCard1Label" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard1/AlertCard1Margin" unique_id=321826766]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
+theme_override_font_sizes/font_size = 13
+text = "Build queue complete • 2m ago"
+
+[node name="AlertCard2" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1554105998]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="AlertCard2Margin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard2" unique_id=671812544]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="AlertCard2Label" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard2/AlertCard2Margin" unique_id=524950237]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
+theme_override_font_sizes/font_size = 13
+text = "Calendar: design sync at 15:00"
+
+[node name="AlertCard3" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1750454970]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="AlertCard3Margin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard3" unique_id=1710302384]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="AlertCard3Label" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/AlertCard3/AlertCard3Margin" unique_id=556496919]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
+theme_override_font_sizes/font_size = 13
+text = "Slack thread updated • #jarvis-client"
+
+[node name="MiniInfoCard" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1923599296]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+
+[node name="MiniInfoMargin" type="MarginContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard" unique_id=864597983]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="MiniInfoVBox" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin" unique_id=750140]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="MiniInfoTitle" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin/MiniInfoVBox" unique_id=1593249418]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.886275, 0.905882, 0.956863, 1)
+theme_override_font_sizes/font_size = 15
+text = "Quick Info"
+
+[node name="MiniInfoLine1" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin/MiniInfoVBox" unique_id=2001762764]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72549, 0.768627, 0.878431, 1)
+theme_override_font_sizes/font_size = 13
+text = "Agent state: roaming"
+
+[node name="MiniInfoLine2" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin/MiniInfoVBox" unique_id=427426396]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72549, 0.768627, 0.878431, 1)
+theme_override_font_sizes/font_size = 13
+text = "Today events: 2"
+
+[node name="MiniInfoLine3" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent/MiniInfoCard/MiniInfoMargin/MiniInfoVBox" unique_id=1477200111]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72549, 0.768627, 0.878431, 1)
+theme_override_font_sizes/font_size = 13
+text = "Pending alerts: 3"
+
+[node name="SidebarCompact" type="VBoxContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack" unique_id=352586911]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -26.0
+offset_top = -66.0
+offset_right = 26.0
+offset_bottom = 66.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="SidebarCompactTitle" type="Label" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarCompact" unique_id=1674481371]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.752941, 0.784314, 0.870588, 1)
+theme_override_font_sizes/font_size = 14
+text = "ALERT"
+horizontal_alignment = 1
+
+[node name="SidebarExpandButton" type="Button" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarCompact" unique_id=103835359]
+custom_minimum_size = Vector2(52, 34)
+layout_mode = 2
+text = ">>"
+
+[node name="TrayBar" type="PanelContainer" parent="MainLayout/RootVBox" unique_id=738466725]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tray")
+
+[node name="TrayMargin" type="MarginContainer" parent="MainLayout/RootVBox/TrayBar" unique_id=934984471]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="TrayRow" type="HBoxContainer" parent="MainLayout/RootVBox/TrayBar/TrayMargin" unique_id=1173240708]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TrayStatusLabel" type="Label" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=29721828]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.713726, 0.752941, 0.85098, 1)
+theme_override_font_sizes/font_size = 14
+text = "Roaming active"
+vertical_alignment = 1
+
+[node name="TraySidebarToggleButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=890632975]
+custom_minimum_size = Vector2(118, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.886275, 0.956863, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_tray_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+text = "Hide Alerts"
+
+[node name="TrayRoamToggleButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=668429941]
+custom_minimum_size = Vector2(118, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.886275, 0.956863, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_tray_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+text = "Pause Roam"
+
+[node name="TrayMoodButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=1990648140]
+custom_minimum_size = Vector2(106, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.886275, 0.956863, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_tray_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+text = "Next Mood"
+
+[node name="TrayMonitorToggleButton" type="Button" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=1976373862]
+custom_minimum_size = Vector2(132, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.862745, 0.886275, 0.956863, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_tray_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_nav_button_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_nav_button_hover")
+text = "Pause Monitor"
+
+[node name="ClockLabel" type="Label" parent="MainLayout/RootVBox/TrayBar/TrayMargin/TrayRow" unique_id=1478690462]
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.705882, 0.745098, 0.843137, 1)
+theme_override_font_sizes/font_size = 14
+text = "--:--"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MoodTimer" type="Timer" parent="." unique_id=2126192124]
+wait_time = 4.0
+
+[node name="ClockTimer" type="Timer" parent="." unique_id=1250385468]
+autostart = true
+
+[node name="PollTimer" type="Timer" parent="." unique_id=818945564]
+wait_time = 45.0
+autostart = true
+
+[node name="BubbleTimer" type="Timer" parent="." unique_id=436272944]
+one_shot = true
+wait_time = 4.0
+
+[node name="CalendarRequest" type="HTTPRequest" parent="." unique_id=1482383535]
+
+[node name="SlackRequest" type="HTTPRequest" parent="." unique_id=1850888099]

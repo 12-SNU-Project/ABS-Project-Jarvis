@@ -14,30 +14,20 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="Jarvis Client"
-run/main_scene="uid://51yptvfp4rii"
+config/name="Jarvis Avatar Client"
+run/main_scene="res://scenes/core/avatar_embed_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [autoload]
 
 MCPRuntime="*uid://ck0qqakp8rfo"
-AuthSession="*res://scripts/core/auth_session.gd"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
-window/size/mode=2
+window/size/viewport_width=1366
+window/size/viewport_height=820
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
 
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/auto_reload/plugin.cfg", "res://addons/godot_mcp_editor/plugin.cfg", "res://addons/godot_mcp_runtime/plugin.cfg")
-
-[jarvis]
-
-auth/google_client_id=""
-auth/google_client_secret=""
-auth/oauth_callback_host="127.0.0.1"
-auth/oauth_callback_port=8756
