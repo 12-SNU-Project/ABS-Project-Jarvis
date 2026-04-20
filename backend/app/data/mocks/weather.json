@@ -1,7 +1,7 @@
 {
-  "summary": "맑고 일교차가 있어 가벼운 겉옷이 필요합니다.",
-  "temperature_c": 17,
+  "summary": "4월 21일 오전은 맑고 온화해서 09:00 프로젝트 발표 이동에 무리가 없습니다.",
+  "temperature_c": 20,
   "condition": "sunny",
-  "recommendation": "얇은 니트나 셔츠 위에 가벼운 자켓을 추천합니다.",
-  "items": ["light jacket", "shirt", "sneakers"]
+  "recommendation": "발표 시작 전 08:50 입장을 목표로 셔츠와 편한 신발, 물 한 병을 준비하세요.",
+  "items": ["shirt", "sneakers", "water bottle", "presentation clicker"]
 }

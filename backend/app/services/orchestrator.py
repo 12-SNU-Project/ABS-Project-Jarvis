@@ -29,14 +29,15 @@ def _build_fallback_summary(
         slack_actions.extend(channel.get("action_items", []))
     top_actions = ", ".join(slack_actions[:2]) if slack_actions else "확인할 액션 아이템은 아직 없습니다"
 
-    return (
+    concise = (
         f"{weather['summary']} "
         f"{calendar['summary']}{calendar_conflict} "
         f"{slack['summary']} "
-        f"우선 확인할 슬랙 액션은 {top_actions}입니다. "
-        f"오늘 가장 토큰 사용량이 큰 기능은 {admin['top_token_feature']}이고, "
-        f"데모 마무리 메시지는 '{presentation['closing_message']}'입니다."
-    )
+        f"우선 확인할 슬랙 액션은 {top_actions}입니다."
+    ).strip()
+    if len(concise) > 220:
+        return concise[:220].rstrip() + "..."
+    return concise
 
 
 def _generate_final_summary(

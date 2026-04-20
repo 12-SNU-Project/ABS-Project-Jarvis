@@ -1,29 +1,29 @@
 {
-  "summary": "오전 회의가 몰려 있어 이동 시간을 미리 확인하는 편이 좋습니다.",
+  "summary": "4월 21일 저녁 발표 준비 중심 일정으로 운영되며, 21:00 발표 세션이 핵심입니다.",
   "events": [
     {
-      "title": "데일리 스탠드업",
-      "start": "09:30",
-      "end": "10:00",
+      "title": "발표 리허설",
+      "start": "19:30",
+      "end": "20:10",
       "location": "Zoom",
       "priority": "high"
     },
     {
-      "title": "외부 미팅",
-      "start": "11:00",
-      "end": "12:00",
-      "location": "Gangnam",
+      "title": "발표 장비 점검",
+      "start": "20:15",
+      "end": "20:40",
+      "location": "Office",
       "priority": "high"
     },
     {
-      "title": "기획 리뷰",
-      "start": "15:00",
-      "end": "16:00",
-      "location": "Office",
-      "priority": "medium"
+      "title": "발표 일정",
+      "start": "21:00",
+      "end": "22:00",
+      "location": "Main Hall",
+      "priority": "high"
     }
   ],
   "conflicts": [
-    "10:30 출발 기준 외부 미팅 전 이동 버퍼가 15분 정도로 짧습니다."
+    "20:40 이후 발표장 이동 버퍼가 짧아 리허설 종료 즉시 이동이 필요합니다."
   ]
 }

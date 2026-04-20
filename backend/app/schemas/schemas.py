@@ -741,6 +741,24 @@ class AgentInterpretResponse(FeatureResponse):
                     "source": "openai",
                     "command": "move event evt-3 to 2026-04-18 from 15:30 to 16:30 calendar primary",
                     "explanation": "Matched '기획리뷰' to evt-3 and shifted the meeting by 30 minutes.",
+                    "tool_calls": [
+                        {
+                            "name": "create_calendar_operation_proposal",
+                            "method": "POST",
+                            "path": "/api/v1/calendar-operations/proposals",
+                            "query": {},
+                            "body": {
+                                "operation_type": "move_event",
+                                "actor": "agent",
+                                "calendar_id": "primary",
+                                "event_id": "evt-3",
+                                "event": {
+                                    "start": "2026-04-18T15:30:00+09:00",
+                                    "end": "2026-04-18T16:30:00+09:00",
+                                },
+                            },
+                        }
+                    ],
                 }
             ]
         }
@@ -759,6 +777,13 @@ class AgentInterpretResponse(FeatureResponse):
     )
     explanation: str = Field(
         description="Human-readable explanation of the resolution or clarification request."
+    )
+    tool_calls: list[dict[str, Any]] = Field(
+        default_factory=list,
+        description=(
+            "Backend-resolved API tool calls for the normalized command. "
+            "Each item includes name, method, path, query, and body."
+        ),
     )
 
 
