@@ -493,6 +493,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
 theme_override_font_sizes/font_size = 13
 text = "Build queue complete • 2m ago"
+autowrap_mode = 3
 
 [node name="AlertCard2" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1554105998]
 layout_mode = 2
@@ -510,6 +511,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
 theme_override_font_sizes/font_size = 13
 text = "Calendar: design sync at 15:00"
+autowrap_mode = 3
 
 [node name="AlertCard3" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1750454970]
 layout_mode = 2
@@ -527,6 +529,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.780392, 0.815686, 0.901961, 1)
 theme_override_font_sizes/font_size = 13
 text = "Slack thread updated • #jarvis-client"
+autowrap_mode = 3
 
 [node name="MiniInfoCard" type="PanelContainer" parent="MainLayout/RootVBox/TopRow/RightSidebar/SidebarMargin/SidebarStack/SidebarContent" unique_id=1923599296]
 layout_mode = 2
@@ -710,3 +713,5 @@ one_shot = true
 [node name="SttRequest" type="HTTPRequest" parent="." unique_id=665382465]
 
 [node name="AgentInterpretRequest" type="HTTPRequest" parent="." unique_id=2079312090]
+
+[node name="ToolCallRequest" type="HTTPRequest" parent="." unique_id=1029384756]
